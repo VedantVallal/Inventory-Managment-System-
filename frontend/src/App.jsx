@@ -15,6 +15,8 @@ import Customers from './pages/Customers';
 import Suppliers from './pages/Suppliers';
 import Purchases from './pages/Purchases';
 import CreatePurchase from './pages/CreatePurchase';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -109,6 +111,28 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <CreatePurchase />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Reports />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Settings />
                 </Layout>
               </ProtectedRoute>
             }
