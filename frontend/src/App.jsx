@@ -13,6 +13,8 @@ import Sales from './pages/Sales';
 import CreateSale from './pages/CreateSale';
 import Customers from './pages/Customers';
 import Suppliers from './pages/Suppliers';
+import Purchases from './pages/Purchases';
+import CreatePurchase from './pages/CreatePurchase';
 
 function App() {
   return (
@@ -85,6 +87,28 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Suppliers />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/purchases"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Purchases />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/purchases/create"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <CreatePurchase />
                 </Layout>
               </ProtectedRoute>
             }
