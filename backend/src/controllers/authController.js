@@ -201,26 +201,25 @@ const login = async (req, res) => {
     // Get user details from users table
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select(`
-        id,
-        email,
-        full_name,
-        role,
-        business_id,
-        is_active,
-        businesses (
-          id,
-          business_name,
-          owner_name,
-          currency
-        )
-      `)
+      .select('id, email, full_name, role, business_id, is_active, phone')
       .eq('email', email)
       .single();
 
     if (userError || !user) {
-      logger.error('User not found:', userError);
+      logger.error('User not found in users table:', userError);
       return sendError(res, 404, 'User not found');
+    }
+
+    // Get business details separately
+    const { data: business, error: businessError } = await supabase
+      .from('businesses')
+      .select('id, business_name, owner_name, currency')
+      .eq('id', user.business_id)
+      .single();
+
+    if (businessError || !business) {
+      logger.error('Business not found for user:', businessError);
+      return sendError(res, 404, 'Business not found for this user');
     }
 
     // Check if user is active
