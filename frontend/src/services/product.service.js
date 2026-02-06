@@ -2,8 +2,8 @@ import api from './api';
 
 const productService = {
     // Get all products
-    getAll: async () => {
-        return await api.get('/products');
+    getAll: async (params) => {
+        return await api.get('/products', { params });
     },
 
     // Get single product

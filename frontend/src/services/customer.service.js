@@ -2,8 +2,8 @@ import api from './api';
 
 const customerService = {
     // Get all customers
-    getAll: async () => {
-        return await api.get('/customers');
+    getAll: async (params) => {
+        return await api.get('/customers', { params });
     },
 
     // Get single customer

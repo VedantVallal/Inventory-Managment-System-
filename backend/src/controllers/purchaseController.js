@@ -26,7 +26,8 @@ const getAllPurchases = async (req, res) => {
           full_name
         ),
         purchase_items (
-          id
+          id,
+          quantity
         )
       `, { count: 'exact' })
             .eq('business_id', businessId)
@@ -54,10 +55,13 @@ const getAllPurchases = async (req, res) => {
             return sendError(res, 500, 'Failed to fetch purchases', error.message);
         }
 
-        // Transform data to include total_items count
+        // Transform data to include total_quantity sum (Sum of all item quantities)
         const purchases = rawPurchases.map(p => ({
             ...p,
-            total_items: p.purchase_items ? p.purchase_items.length : 0
+            // Calculate sum of quantities if items exist, otherwise 0
+            total_items: p.purchase_items
+                ? p.purchase_items.reduce((sum, item) => sum + (item.quantity || 0), 0)
+                : 0
         }));
 
         return sendSuccess(res, 200, 'Purchases retrieved successfully', {

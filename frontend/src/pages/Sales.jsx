@@ -99,7 +99,7 @@ const Sales = () => {
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Invoice #</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Date</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Customer</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Items</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Total Qty</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Total</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Payment</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Actions</th>
@@ -130,7 +130,7 @@ const Sales = () => {
                                                     {sale.customers?.customer_name || 'Walk-in'}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-text-secondary">
-                                                    {sale.total_items || 0} items
+                                                    {sale.total_items || 0} units
                                                 </td>
                                                 <td className="px-6 py-4 font-semibold text-text-primary">
                                                     ₹{parseFloat(sale.total_amount).toLocaleString()}

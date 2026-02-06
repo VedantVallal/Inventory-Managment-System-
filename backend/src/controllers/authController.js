@@ -160,10 +160,10 @@ const register = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        fullName: user.full_name,
+        full_name: user.full_name,
         role: user.role,
         businessId: business.id,
-        businessName: business.business_name
+        business_name: business.business_name
       }
     });
 
@@ -238,10 +238,10 @@ const login = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        fullName: user.full_name,
+        full_name: user.full_name,
         role: user.role,
         businessId: user.business_id,
-        businessName: business.business_name,
+        business_name: business.business_name,
         currency: business.currency
       }
     });
@@ -413,11 +413,73 @@ const resetPassword = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Change password (authenticated)
+ * @route   POST /api/v1/auth/change-password
+ * @access  Private
+ */
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.userId;
+
+    if (!currentPassword || !newPassword) {
+      return sendError(res, 400, 'Please provide current and new password');
+    }
+
+    if (newPassword.length < 6) {
+      return sendError(res, 400, 'New password must be at least 6 characters');
+    }
+
+    // Explicitly sign in with current password to verify it
+    // Supabase admin.updateUser doesn't require old password, so we must verify manually
+    // But we don't have the user's email in req.body. check req.user or fetch email.
+    // Easier way: Fetch user email
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('email')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !user) {
+      return sendError(res, 404, 'User not found');
+    }
+
+    // Verify current password by attempting sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword
+    });
+
+    if (signInError) {
+      return sendError(res, 400, 'Incorrect current password');
+    }
+
+    // Update password
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+
+    if (updateError) {
+      logger.error('Error changing password:', updateError);
+      return sendError(res, 500, 'Failed to update password');
+    }
+
+    logger.success('Password changed for user:', userId);
+    return sendSuccess(res, 200, 'Password changed successfully');
+
+  } catch (error) {
+    logger.error('Change password error:', error);
+    return sendError(res, 500, 'Server error', error.message);
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
   logout,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  changePassword
 };

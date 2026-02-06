@@ -35,7 +35,7 @@ const Reports = () => {
             ]);
 
             const productsData = productsRes.success && productsRes.data?.products ? productsRes.data.products : [];
-            const salesData = salesRes.success && salesRes.data?.sales ? salesRes.data.sales : [];
+            const salesData = salesRes.success && (salesRes.data?.sales || salesRes.data?.bills) ? (salesRes.data.sales || salesRes.data.bills) : [];
             const purchasesData = purchasesRes.success && purchasesRes.data?.purchases ? purchasesRes.data.purchases : [];
 
             setProducts(productsData);

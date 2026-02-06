@@ -23,7 +23,7 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendValue, color = 'cyan
                 )}
             </div>
             <h3 className="text-text-muted text-sm font-medium mb-1">{title}</h3>
-            <p className="text-3xl font-bold text-text-primary">{value}</p>
+            <p className="text-3xl font-bold text-text-primary break-words" title={value}>{value}</p>
         </div>
     );
 };

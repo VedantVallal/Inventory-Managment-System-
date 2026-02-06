@@ -70,13 +70,25 @@ const CreateSale = () => {
     };
 
     const updateQuantity = (productId, newQuantity) => {
-        if (newQuantity <= 0) {
-            removeFromCart(productId);
+        // Allow empty string for better typing experience
+        if (newQuantity === '') {
+            setCart(cart.map(item =>
+                item.product_id === productId
+                    ? { ...item, quantity: '' }
+                    : item
+            ));
             return;
         }
+
+        const qty = parseInt(newQuantity);
+        if (qty <= 0) {
+            // Protect against accidental deletion
+            return;
+        }
+
         setCart(cart.map(item =>
             item.product_id === productId
-                ? { ...item, quantity: parseInt(newQuantity) }
+                ? { ...item, quantity: qty }
                 : item
         ));
     };
@@ -234,9 +246,10 @@ const CreateSale = () => {
                                                 <input
                                                     type="number"
                                                     min="1"
+                                                    step="1"
                                                     value={item.quantity}
                                                     onChange={(e) => updateQuantity(item.product_id, e.target.value)}
-                                                    className="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
+                                                    className="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-cyan focus:border-transparent outline-none transition-all"
                                                 />
                                                 <button
                                                     onClick={() => removeFromCart(item.product_id)}

@@ -24,6 +24,10 @@ const getAllBills = async (req, res) => {
         users!bills_created_by_fkey (
           id,
           full_name
+        ),
+        bill_items (
+            id,
+            quantity
         )
       `, { count: 'exact' })
             .eq('business_id', businessId)
@@ -50,15 +54,23 @@ const getAllBills = async (req, res) => {
         const offset = (page - 1) * limit;
         query = query.range(offset, offset + parseInt(limit) - 1);
 
-        const { data: bills, error, count } = await query;
+        const { data: rawBills, error, count } = await query;
 
         if (error) {
             logger.error('Error fetching bills:', error);
             return sendError(res, 500, 'Failed to fetch bills', error.message);
         }
 
+        // Transform data to include total_items (sum of quantities)
+        const bills = rawBills.map(bill => ({
+            ...bill,
+            total_items: bill.bill_items
+                ? bill.bill_items.reduce((sum, item) => sum + (item.quantity || 0), 0)
+                : 0
+        }));
+
         return sendSuccess(res, 200, 'Bills retrieved successfully', {
-            bills,
+            bills, // Frontend expects 'bills' (or we should handle 'sales' too, but consistency is key)
             pagination: {
                 total: count,
                 page: parseInt(page),

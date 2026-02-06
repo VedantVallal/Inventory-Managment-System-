@@ -27,22 +27,40 @@ const Settings = () => {
     });
 
     useEffect(() => {
-        if (user) {
-            setBusinessData({
-                businessName: user.business_name || '',
-                ownerName: user.owner_name || '',
-                email: user.email || '',
-                phone: user.phone || '',
-                address: user.address || '',
-            });
+        fetchBusinessProfile();
+    }, []);
+
+    const fetchBusinessProfile = async () => {
+        try {
+            const response = await api.get('/settings/business');
+            if (response.data.success && response.data.data.business) {
+                const business = response.data.data.business;
+                setBusinessData({
+                    businessName: business.business_name || '',
+                    ownerName: business.owner_name || '',
+                    email: business.email || '',
+                    phone: business.phone || '',
+                    address: business.address || '',
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching business settings:', error);
+            // Fallback to user context if API fails, though API should work
+            if (user) {
+                setBusinessData(prev => ({
+                    ...prev,
+                    businessName: user.businessName || prev.businessName,
+                    email: user.email || prev.email,
+                }));
+            }
         }
-    }, [user]);
+    };
 
     const handleUpdateBusiness = async () => {
         try {
             setLoading(true);
 
-            const response = await api.put(`/businesses/${user.business_id}`, {
+            const response = await api.put('/settings/business', {
                 businessName: businessData.businessName,
                 ownerName: businessData.ownerName,
                 phone: businessData.phone,
@@ -74,7 +92,7 @@ const Settings = () => {
         try {
             setLoading(true);
 
-            const response = await api.put('/users/change-password', {
+            const response = await api.post('/auth/change-password', {
                 currentPassword: passwordData.currentPassword,
                 newPassword: passwordData.newPassword,
             });
@@ -118,8 +136,8 @@ const Settings = () => {
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
                                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === tab.id
-                                                    ? 'bg-cyan text-white'
-                                                    : 'text-text-secondary hover:bg-bg-primary'
+                                                ? 'bg-cyan text-white'
+                                                : 'text-text-secondary hover:bg-bg-primary'
                                                 }`}
                                         >
                                             <Icon size={20} />

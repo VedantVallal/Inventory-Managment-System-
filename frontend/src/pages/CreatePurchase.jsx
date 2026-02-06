@@ -65,21 +65,47 @@ const CreatePurchase = () => {
     };
 
     const updateQuantity = (productId, newQuantity) => {
-        if (newQuantity <= 0) {
-            removeFromCart(productId);
+        // Allow empty string for better typing experience
+        if (newQuantity === '') {
+            setCart(cart.map(item =>
+                item.product_id === productId
+                    ? { ...item, quantity: '' }
+                    : item
+            ));
             return;
         }
+
+        const qty = parseInt(newQuantity);
+        if (qty <= 0) {
+            // Optional: Ask for confirmation or just return to avoid accidental deletion
+            // For now, we'll just not update if <= 0 to prevent issues, user can use delete button
+            return;
+        }
+
         setCart(cart.map(item =>
             item.product_id === productId
-                ? { ...item, quantity: parseInt(newQuantity) }
+                ? { ...item, quantity: qty }
                 : item
         ));
     };
 
     const updatePurchasePrice = (productId, newPrice) => {
+        // Allow empty string
+        if (newPrice === '') {
+            setCart(cart.map(item =>
+                item.product_id === productId
+                    ? { ...item, purchase_price: '' }
+                    : item
+            ));
+            return;
+        }
+
+        const price = parseFloat(newPrice);
+        if (price < 0) return;
+
         setCart(cart.map(item =>
             item.product_id === productId
-                ? { ...item, purchase_price: parseFloat(newPrice) || 0 }
+                ? { ...item, purchase_price: price }
                 : item
         ));
     };
@@ -234,6 +260,7 @@ const CreatePurchase = () => {
                                                         <input
                                                             type="number"
                                                             min="1"
+                                                            step="1"
                                                             value={item.quantity}
                                                             onChange={(e) => updateQuantity(item.product_id, e.target.value)}
                                                             className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-cyan focus:border-transparent outline-none transition-all"

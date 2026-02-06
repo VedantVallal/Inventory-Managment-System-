@@ -83,8 +83,8 @@ const Purchases = () => {
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Purchase #</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Date</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Supplier</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Items</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Total</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Total Qty</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Total Amount</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Status</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Actions</th>
                                 </tr>
@@ -112,7 +112,7 @@ const Purchases = () => {
                                                 {purchase.suppliers?.supplier_name || 'N/A'}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-text-secondary">
-                                                {purchase.total_items || 0} items
+                                                {purchase.total_items || 0} units
                                             </td>
                                             <td className="px-6 py-4 font-semibold text-text-primary">
                                                 ₹{parseFloat(purchase.total_amount).toLocaleString()}
