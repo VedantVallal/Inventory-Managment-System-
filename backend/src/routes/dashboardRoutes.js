@@ -15,6 +15,7 @@ router.get('/metrics', getDashboardMetrics);
 
 // Get recent activities
 router.get('/activities', getRecentActivities);
+router.get('/recent-activities', getRecentActivities); // Alias for frontend
 
 // Get sales chart data
 router.get('/sales-chart', getSalesChartData);

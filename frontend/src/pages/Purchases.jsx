@@ -19,7 +19,7 @@ const Purchases = () => {
         try {
             setLoading(true);
             const response = await purchaseService.getAll();
-            console.log('Purchases API response:', response);
+
 
             if (response.success && response.data && Array.isArray(response.data.purchases)) {
                 setPurchases(response.data.purchases);

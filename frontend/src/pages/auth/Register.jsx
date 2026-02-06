@@ -46,7 +46,7 @@ const Register = () => {
         }
 
         try {
-            console.log('Attempting registration with:', formData.email);
+
 
             // Prepare data for backend API
             const userData = {

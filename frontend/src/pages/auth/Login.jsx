@@ -28,7 +28,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            console.log('Attempting login with:', formData.email);
+
             await login(formData.email, formData.password);
             toast.success('Login successful!');
             navigate('/dashboard');

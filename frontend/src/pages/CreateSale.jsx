@@ -98,9 +98,13 @@ const CreateSale = () => {
         try {
             setLoading(true);
 
+            const totalAmount = calculateTotal();
+
             const saleData = {
                 customerId: selectedCustomer || null,
                 paymentMethod,
+                paymentStatus: 'paid',
+                paidAmount: totalAmount, // Add paid amount for complete payment
                 items: cart.map(item => ({
                     productId: item.product_id,
                     quantity: item.quantity,
@@ -254,16 +258,32 @@ const CreateSale = () => {
                                 </div>
                             </div>
 
-                            {/* Complete Sale Button */}
-                            <Button
-                                variant="primary"
-                                className="w-full"
-                                onClick={handleCreateSale}
-                                loading={loading}
-                                disabled={cart.length === 0}
-                            >
-                                Complete Sale
-                            </Button>
+                            {/* Validation Message */}
+                            {cart.length === 0 && (
+                                <p className="text-xs text-red-500 mb-2 text-center">
+                                    Add products to cart to continue
+                                </p>
+                            )}
+
+                            <div className="flex gap-3">
+                                <Button
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => navigate('/sales')}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    className="flex-[2]"
+                                    onClick={handleCreateSale}
+                                    loading={loading}
+                                    disabled={cart.length === 0}
+                                >
+                                    Complete Sale
+                                </Button>
+                            </div>
                         </Card>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Phone, Mail, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, Phone, Mail, MapPin, Truck } from 'lucide-react';
 import supplierService from '../services/supplier.service';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
@@ -132,8 +132,17 @@ const Suppliers = () => {
                     {/* Suppliers Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {suppliers.length === 0 ? (
-                            <div className="col-span-full text-center py-12 text-text-muted">
-                                No suppliers found. Click "Add Supplier" to create one.
+                            <div className="col-span-full flex flex-col items-center justify-center p-12 bg-white rounded-card shadow-card text-center">
+                                <div className="bg-cyan-50 p-4 rounded-full mb-4">
+                                    <Truck size={32} className="text-cyan" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-navy mb-2">No Suppliers Found</h3>
+                                <p className="text-text-muted mb-6 max-w-sm">
+                                    Get started by adding your first supplier to the system.
+                                </p>
+                                <Button variant="primary" icon={Plus} onClick={handleAddSupplier}>
+                                    Add Supplier
+                                </Button>
                             </div>
                         ) : (
                             suppliers.map((supplier) => (

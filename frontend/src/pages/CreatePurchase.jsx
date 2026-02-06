@@ -106,12 +106,17 @@ const CreatePurchase = () => {
         try {
             setLoading(true);
 
+            // Generate invoice number
+            const invoiceNumber = `PUR-${Date.now()}`;
+
             const purchaseData = {
                 supplierId: selectedSupplier,
+                invoiceNumber,
+                purchaseDate: new Date().toISOString().split('T')[0],
                 items: cart.map(item => ({
                     productId: item.product_id,
                     quantity: item.quantity,
-                    unitPrice: item.purchase_price,
+                    purchasePrice: item.purchase_price, // Changed from unitPrice
                 })),
             };
 
@@ -225,24 +230,24 @@ const CreatePurchase = () => {
 
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <div>
-                                                        <label className="text-xs text-text-muted">Quantity</label>
+                                                        <label className="text-xs text-text-muted mb-1 block">Quantity</label>
                                                         <input
                                                             type="number"
                                                             min="1"
                                                             value={item.quantity}
                                                             onChange={(e) => updateQuantity(item.product_id, e.target.value)}
-                                                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                                            className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-cyan focus:border-transparent outline-none transition-all"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="text-xs text-text-muted">Price (₹)</label>
+                                                        <label className="text-xs text-text-muted mb-1 block">Price (₹)</label>
                                                         <input
                                                             type="number"
                                                             min="0"
                                                             step="0.01"
                                                             value={item.purchase_price}
                                                             onChange={(e) => updatePurchasePrice(item.product_id, e.target.value)}
-                                                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                                            className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-cyan focus:border-transparent outline-none transition-all"
                                                         />
                                                     </div>
                                                 </div>
@@ -264,16 +269,32 @@ const CreatePurchase = () => {
                                 </div>
                             </div>
 
-                            {/* Complete Purchase Button */}
-                            <Button
-                                variant="primary"
-                                className="w-full"
-                                onClick={handleCreatePurchase}
-                                loading={loading}
-                                disabled={cart.length === 0 || !selectedSupplier}
-                            >
-                                Complete Purchase
-                            </Button>
+                            {/* Validation Message */}
+                            {(!selectedSupplier || cart.length === 0) && (
+                                <p className="text-xs text-red-500 mb-2 text-center">
+                                    {!selectedSupplier ? 'Select a supplier' : 'Add products to cart'} to continue
+                                </p>
+                            )}
+
+                            <div className="flex gap-3">
+                                <Button
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => navigate('/purchases')}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    className="flex-[2]"
+                                    onClick={handleCreatePurchase}
+                                    loading={loading}
+                                    disabled={cart.length === 0 || !selectedSupplier}
+                                >
+                                    Complete Purchase
+                                </Button>
+                            </div>
                         </Card>
                     </div>
                 </div>

@@ -42,7 +42,7 @@ const Products = () => {
         try {
             setLoading(true);
             const response = await productService.getAll();
-            console.log('Products API response:', response);
+
 
             if (response.success && response.data && Array.isArray(response.data.products)) {
                 setProducts(response.data.products);

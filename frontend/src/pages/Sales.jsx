@@ -19,10 +19,16 @@ const Sales = () => {
         try {
             setLoading(true);
             const response = await saleService.getAll();
-            console.log('Sales API response:', response);
 
-            if (response.success && response.data && Array.isArray(response.data.sales)) {
-                setSales(response.data.sales);
+
+            if (response.success && response.data) {
+                // Backend returns 'bills', ensure we handle both 'sales' and 'bills'
+                const salesData = response.data.sales || response.data.bills || [];
+                if (Array.isArray(salesData)) {
+                    setSales(salesData);
+                } else {
+                    setSales([]);
+                }
             } else {
                 setSales([]);
             }

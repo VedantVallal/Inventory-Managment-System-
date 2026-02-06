@@ -78,20 +78,16 @@ const getDashboardMetrics = async (req, res) => {
             .eq('is_read', false);
 
         return sendSuccess(res, 200, 'Dashboard metrics retrieved successfully', {
-            metrics: {
-                totalProducts: totalProducts || 0,
-                lowStockCount,
-                outOfStockCount,
-                totalStockValue: parseFloat(totalStockValue.toFixed(2)),
-                todaysSales: {
-                    amount: parseFloat(todaysSalesAmount.toFixed(2)),
-                    count: todaysSalesCount
-                },
-                monthSales: parseFloat(monthSalesAmount.toFixed(2)),
-                totalCustomers: totalCustomers || 0,
-                totalSuppliers: totalSuppliers || 0,
-                unreadAlerts: unreadAlerts || 0
-            }
+            totalProducts: totalProducts || 0,
+            lowStockAlerts: lowStockCount,
+            outOfStockCount,
+            totalStockValue: parseFloat(totalStockValue.toFixed(2)),
+            todaySales: parseFloat(todaysSalesAmount.toFixed(2)),
+            todaysSalesCount,
+            monthSales: parseFloat(monthSalesAmount.toFixed(2)),
+            totalCustomers: totalCustomers || 0,
+            totalSuppliers: totalSuppliers || 0,
+            unreadAlerts: unreadAlerts || 0
         });
 
     } catch (error) {
@@ -132,7 +128,7 @@ const getRecentActivities = async (req, res) => {
             return sendError(res, 500, 'Failed to fetch activities', error.message);
         }
 
-        return sendSuccess(res, 200, 'Activities retrieved successfully', { activities });
+        return sendSuccess(res, 200, 'Activities retrieved successfully', activities || []);
 
     } catch (error) {
         logger.error('Recent activities error:', error);
@@ -178,10 +174,10 @@ const getSalesChartData = async (req, res) => {
 
         const formattedData = Object.keys(chartData).map(date => ({
             date,
-            amount: parseFloat(chartData[date].toFixed(2))
+            sales: parseFloat(chartData[date].toFixed(2))
         }));
 
-        return sendSuccess(res, 200, 'Sales chart data retrieved successfully', { chartData: formattedData });
+        return sendSuccess(res, 200, 'Sales chart data retrieved successfully', formattedData);
 
     } catch (error) {
         logger.error('Sales chart error:', error);

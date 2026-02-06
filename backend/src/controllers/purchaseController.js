@@ -24,6 +24,9 @@ const getAllPurchases = async (req, res) => {
         users!purchases_created_by_fkey (
           id,
           full_name
+        ),
+        purchase_items (
+          id
         )
       `, { count: 'exact' })
             .eq('business_id', businessId)
@@ -44,12 +47,18 @@ const getAllPurchases = async (req, res) => {
         const offset = (page - 1) * limit;
         query = query.range(offset, offset + parseInt(limit) - 1);
 
-        const { data: purchases, error, count } = await query;
+        const { data: rawPurchases, error, count } = await query;
 
         if (error) {
             logger.error('Error fetching purchases:', error);
             return sendError(res, 500, 'Failed to fetch purchases', error.message);
         }
+
+        // Transform data to include total_items count
+        const purchases = rawPurchases.map(p => ({
+            ...p,
+            total_items: p.purchase_items ? p.purchase_items.length : 0
+        }));
 
         return sendSuccess(res, 200, 'Purchases retrieved successfully', {
             purchases,
@@ -140,6 +149,8 @@ const createPurchase = async (req, res) => {
             notes
         } = req.body;
 
+        logger.info(`Creating purchase with Invoice: ${invoiceNumber}, Items: ${items?.length}`);
+
         // Validation
         if (!items || items.length === 0) {
             return sendError(res, 400, 'Please provide at least one item');
@@ -150,12 +161,17 @@ const createPurchase = async (req, res) => {
         }
 
         // Check if invoice number already exists
-        const { data: existingPurchase } = await supabase
+        const { data: existingPurchase, error: checkError } = await supabase
             .from('purchases')
             .select('id')
             .eq('business_id', businessId)
             .eq('invoice_number', invoiceNumber)
-            .single();
+            .maybeSingle(); // Use maybeSingle to avoid error on 0 rows
+
+        if (checkError) {
+            logger.error('Error checking invoice number:', checkError);
+            return sendError(res, 500, 'Error checking invoice uniqueness');
+        }
 
         if (existingPurchase) {
             return sendError(res, 400, 'Invoice number already exists');
@@ -229,31 +245,30 @@ const createPurchase = async (req, res) => {
             return sendError(res, 500, 'Failed to create purchase items', itemsError.message);
         }
 
-        // Update stock for each product (CRITICAL: Stock addition)
+        // Update stock for each product (Standard Fetch-Update Pattern)
         for (const item of items) {
             const { productId, quantity } = item;
 
-            const { error: stockError } = await supabase.rpc('increment_stock', {
-                p_product_id: productId,
-                p_quantity: quantity
-            }).catch(async () => {
-                // Fallback if RPC doesn't exist
-                const { data: product } = await supabase
+            // Fetch current stock
+            const { data: product } = await supabase
+                .from('products')
+                .select('current_stock')
+                .eq('id', productId)
+                .eq('business_id', businessId)
+                .single();
+
+            if (product) {
+                const newStock = (product.current_stock || 0) + parseInt(quantity);
+
+                const { error: stockError } = await supabase
                     .from('products')
-                    .select('current_stock')
+                    .update({ current_stock: newStock })
                     .eq('id', productId)
-                    .single();
+                    .eq('business_id', businessId);
 
-                await supabase
-                    .from('products')
-                    .update({
-                        current_stock: product.current_stock + quantity
-                    })
-                    .eq('id', productId);
-            });
-
-            if (stockError) {
-                logger.error('Error updating stock:', stockError);
+                if (stockError) {
+                    logger.error(`Error updating stock for product ${productId}:`, stockError);
+                }
             }
         }
 

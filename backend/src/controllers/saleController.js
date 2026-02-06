@@ -173,12 +173,19 @@ const createBill = async (req, res) => {
         const billPrefix = settings?.bill_prefix || 'INV';
 
         // Generate bill number
-        const { data: billCount } = await supabase
+        const { count, error: countError } = await supabase
             .from('bills')
-            .select('id', { count: 'exact', head: true })
+            .select('*', { count: 'exact', head: true })
             .eq('business_id', businessId);
 
-        const billNumber = `${billPrefix}-${new Date().toISOString().slice(0, 7).replace('-', '')}-${String((billCount?.length || 0) + 1).padStart(4, '0')}`;
+        if (countError) {
+            logger.error('Error getting bill count:', countError);
+        }
+
+        const nextBillNumber = (count || 0) + 1;
+        // Add timestamp component to ensure uniqueness even if count is off
+        const timestamp = Date.now().toString().slice(-4);
+        const billNumber = `${billPrefix}-${new Date().toISOString().slice(0, 7).replace('-', '')}-${String(nextBillNumber).padStart(4, '0')}-${timestamp}`;
 
         // Calculate totals
         let subtotal = 0;
@@ -283,17 +290,25 @@ const createBill = async (req, res) => {
         for (const item of items) {
             const { productId, quantity } = item;
 
-            const { error: stockError } = await supabase
+            // Fetch current stock first
+            const { data: product } = await supabase
                 .from('products')
-                .update({
-                    current_stock: supabase.raw(`current_stock - ${quantity}`)
-                })
+                .select('current_stock')
                 .eq('id', productId)
-                .eq('business_id', businessId);
+                .eq('business_id', businessId)
+                .single();
 
-            if (stockError) {
-                logger.error('Error updating stock:', stockError);
-                // Note: In production, you might want to implement transaction rollback here
+            if (product) {
+                const newStock = product.current_stock - quantity;
+                const { error: stockError } = await supabase
+                    .from('products')
+                    .update({ current_stock: newStock })
+                    .eq('id', productId)
+                    .eq('business_id', businessId);
+
+                if (stockError) {
+                    logger.error('Error updating stock:', stockError);
+                }
             }
         }
 
@@ -313,11 +328,20 @@ const createBill = async (req, res) => {
 
         // Update customer total purchases
         if (customerId) {
-            await supabase.raw(`
-        UPDATE customers 
-        SET total_purchases = total_purchases + ${totalAmount}
-        WHERE id = '${customerId}'
-      `);
+            const { data: customer } = await supabase
+                .from('customers')
+                .select('total_purchases')
+                .eq('id', customerId)
+                .single();
+
+            if (customer) {
+                await supabase
+                    .from('customers')
+                    .update({
+                        total_purchases: (customer.total_purchases || 0) + totalAmount
+                    })
+                    .eq('id', customerId);
+            }
         }
 
         logger.success('Bill created successfully:', billNumber);

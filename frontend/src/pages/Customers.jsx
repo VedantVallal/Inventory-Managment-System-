@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Phone, Mail } from 'lucide-react';
+import { Plus, Edit, Trash2, Phone, Mail, Users } from 'lucide-react';
 import customerService from '../services/customer.service';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
@@ -129,8 +129,17 @@ const Customers = () => {
                     {/* Customers Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {customers.length === 0 ? (
-                            <div className="col-span-full text-center py-12 text-text-muted">
-                                No customers found. Click "Add Customer" to create one.
+                            <div className="col-span-full flex flex-col items-center justify-center p-12 bg-white rounded-card shadow-card text-center">
+                                <div className="bg-cyan-50 p-4 rounded-full mb-4">
+                                    <Users size={32} className="text-cyan" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-navy mb-2">No Customers Found</h3>
+                                <p className="text-text-muted mb-6 max-w-sm">
+                                    Get started by adding your first customer to the system.
+                                </p>
+                                <Button variant="primary" icon={Plus} onClick={handleAddCustomer}>
+                                    Add Customer
+                                </Button>
                             </div>
                         ) : (
                             customers.map((customer) => (
