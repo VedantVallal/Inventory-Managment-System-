@@ -82,7 +82,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         label="Product Name"
                         type="text"
                         name="productName"
-                        placeholder="Laptop HP Pavilion"
+                        placeholder="Enter product name"
                         value={formData.productName}
                         onChange={handleChange}
                         icon={Package}
@@ -92,7 +92,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         label="SKU"
                         type="text"
                         name="sku"
-                        placeholder="LAP-HP-001"
+                        placeholder="Enter SKU"
                         value={formData.sku}
                         onChange={handleChange}
                         icon={Hash}
@@ -106,7 +106,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         label="Purchase Price"
                         type="number"
                         name="purchasePrice"
-                        placeholder="45000"
+                        placeholder="Enter purchase price"
                         value={formData.purchasePrice}
                         onChange={handleChange}
                         icon={DollarSign}
@@ -118,7 +118,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         label="Selling Price"
                         type="number"
                         name="sellingPrice"
-                        placeholder="55000"
+                        placeholder="Enter selling price"
                         value={formData.sellingPrice}
                         onChange={handleChange}
                         icon={DollarSign}
@@ -134,7 +134,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         label="Current Stock"
                         type="number"
                         name="currentStock"
-                        placeholder="20"
+                        placeholder="Enter quantity"
                         value={formData.currentStock}
                         onChange={handleChange}
                         required
@@ -144,7 +144,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         label="Min Stock Level"
                         type="number"
                         name="minStockLevel"
-                        placeholder="5"
+                        placeholder="Enter min stock level"
                         value={formData.minStockLevel}
                         onChange={handleChange}
                         icon={AlertTriangle}
@@ -155,7 +155,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         label="Max Stock Level"
                         type="number"
                         name="maxStockLevel"
-                        placeholder="50"
+                        placeholder="Enter max stock level"
                         value={formData.maxStockLevel}
                         onChange={handleChange}
                         required
@@ -172,7 +172,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        placeholder="Product description..."
+                        placeholder="Enter product description"
                         rows="3"
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan focus:border-transparent transition-all"
                     />

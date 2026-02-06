@@ -123,13 +123,6 @@ const Purchases = () => {
                                             <td className="px-6 py-4">
                                                 <div className="flex gap-2">
                                                     <button
-                                                        onClick={() => navigate(`/purchases/${purchase.id}`)}
-                                                        className="p-2 hover:bg-cyan-50 rounded-lg transition-colors"
-                                                        title="View"
-                                                    >
-                                                        <Eye size={18} className="text-cyan" />
-                                                    </button>
-                                                    <button
                                                         onClick={() => handleDeletePurchase(purchase.id)}
                                                         className="p-2 hover:bg-red-50 rounded-lg transition-colors"
                                                         title="Delete"

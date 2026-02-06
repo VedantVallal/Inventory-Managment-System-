@@ -75,6 +75,7 @@ const Login = () => {
                             value={formData.password}
                             onChange={handleChange}
                             icon={Lock}
+                            showPasswordToggle={true}
                             required
                         />
 

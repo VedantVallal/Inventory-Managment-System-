@@ -8,44 +8,50 @@
   * {
     @apply border-gray-200;
   }
-  
+
   body {
     @apply bg-bg-primary text-text-primary font-sans antialiased;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading;
   }
 }
 
 @layer components {
+
   /* Premium Button Styles */
   .btn {
     @apply px-6 py-2.5 rounded-lg font-medium transition-all duration-150 ease-in-out;
   }
-  
+
   .btn-primary {
     @apply bg-cyan text-white hover:bg-cyan-dark hover:scale-[1.02] active:scale-[0.98];
   }
-  
+
   .btn-secondary {
     @apply border-2 border-slate text-slate hover:bg-slate hover:text-white;
   }
-  
+
   /* Premium Card Styles */
   .card {
     @apply bg-white rounded-card shadow-card p-6 transition-shadow duration-150;
   }
-  
+
   .card-hover {
     @apply hover:shadow-card-hover;
   }
-  
+
   /* Premium Input Styles */
   .input {
     @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan focus:border-transparent transition-all;
   }
-  
+
   /* Premium Table Styles */
   .table-row {
     @apply border-b border-gray-200 hover:bg-bg-primary transition-colors;
@@ -56,4 +62,101 @@
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Thermal Printer Styles for Receipt */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .receipt {
+    width: 80mm !important;
+    margin: 0 !important;
+    padding: 5mm !important;
+  }
+}
+
+/* Camera Scanner Animation */
+.scan-line {
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, transparent, #06b6d4, transparent);
+  box-shadow: 0 0 10px #06b6d4;
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    top: 0%;
+  }
+
+  50% {
+    top: 100%;
+  }
+
+  100% {
+    top: 0%;
+  }
+}
+
+/* Smooth Scroll Behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Landing Page Animations */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce-slow {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in-right {
+  animation: fade-in-right 0.8s ease-out forwards;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
 }

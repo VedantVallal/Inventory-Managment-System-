@@ -171,25 +171,39 @@ const Reports = () => {
                     {/* Stock Status */}
                     <Card>
                         <h3 className="text-lg font-semibold text-text-primary mb-4">Stock Status Distribution</h3>
-                        <ResponsiveContainer width="100%" height={250}>
-                            <PieChart>
-                                <Pie
-                                    data={stockStatusData}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={({ name, value }) => `${name}: ${value}`}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                >
-                                    {stockStatusData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
+                        {products.length === 0 ? (
+                            <div className="flex items-center justify-center h-[250px] text-text-muted">
+                                <div className="text-center">
+                                    <Package size={48} className="mx-auto mb-2 opacity-50" />
+                                    <p>No inventory data available</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <ResponsiveContainer width="100%" height={250}>
+                                <PieChart>
+                                    <Pie
+                                        data={stockStatusData.filter(item => item.value > 0)}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        label={false}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                    >
+                                        {stockStatusData.filter(item => item.value > 0).map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => `${value} products`} />
+                                    <Legend
+                                        verticalAlign="bottom"
+                                        height={36}
+                                        formatter={(value, entry) => `${entry.payload.name}: ${entry.payload.value}`}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        )}
                     </Card>
 
                     {/* Top Products by Stock */}

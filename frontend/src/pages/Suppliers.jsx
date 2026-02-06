@@ -60,9 +60,39 @@ const Suppliers = () => {
         setIsModalOpen(true);
     };
 
+    const validatePhone = (phone) => {
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(phone)) {
+            toast.error('Phone number must be exactly 10 digits');
+            return false;
+        }
+        return true;
+    };
+
+    const validateEmail = (email) => {
+        if (!email) return true; // Email is optional
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(email)) {
+            toast.error('Email must be a valid Gmail address (@gmail.com)');
+            return false;
+        }
+        return true;
+    };
+
     const handleSaveSupplier = async () => {
         if (!formData.supplierName || !formData.phone) {
             toast.error('Supplier name and phone are required');
+            return;
+        }
+
+        // Validate phone number
+        if (!validatePhone(formData.phone)) {
+            return;
+        }
+
+        // Validate email if provided
+        if (formData.email && !validateEmail(formData.email)) {
             return;
         }
 

@@ -16,13 +16,18 @@ import Suppliers from './pages/Suppliers';
 import Purchases from './pages/Purchases';
 import CreatePurchase from './pages/CreatePurchase';
 import Reports from './pages/Reports';
-import Settings from './pages/Settings';
+import MyProfile from './pages/MyProfile';
+import POSBilling from './pages/POSBilling';
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Landing Page */}
+          <Route path="/" element={<LandingPage />} />
+
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -128,11 +133,22 @@ function App() {
           />
 
           <Route
-            path="/settings"
+            path="/my-profile"
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Settings />
+                  <MyProfile />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pos"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <POSBilling />
                 </Layout>
               </ProtectedRoute>
             }

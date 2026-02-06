@@ -58,9 +58,23 @@ const Customers = () => {
         setIsModalOpen(true);
     };
 
+    const validatePhone = (phone) => {
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(phone)) {
+            toast.error('Phone number must be exactly 10 digits');
+            return false;
+        }
+        return true;
+    };
+
     const handleSaveCustomer = async () => {
         if (!formData.customerName || !formData.phone) {
             toast.error('Customer name and phone are required');
+            return;
+        }
+
+        // Validate phone number
+        if (!validatePhone(formData.phone)) {
             return;
         }
 

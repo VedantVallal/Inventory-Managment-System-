@@ -22,6 +22,54 @@ const Dashboard = () => {
         fetchDashboardData();
     }, []);
 
+    // Transform activity logs from backend to frontend format
+    const transformActivities = (activityLogs) => {
+        if (!Array.isArray(activityLogs)) return [];
+
+        return activityLogs.map(log => {
+            // Map entity_type to activity type
+            let type = 'default';
+            if (log.entity_type === 'bill' || log.entity_type === 'sale') {
+                type = 'sale';
+            } else if (log.entity_type === 'purchase') {
+                type = 'purchase';
+            } else if (log.entity_type === 'product') {
+                type = 'stock';
+            } else if (log.action === 'alert' || log.entity_type === 'alert') {
+                type = 'alert';
+            }
+
+            // Create title from action and entity_type
+            const actionText = log.action ? log.action.charAt(0).toUpperCase() + log.action.slice(1) : 'Activity';
+            const entityText = log.entity_type ? log.entity_type.replace('_', ' ') : '';
+            const title = `${actionText} ${entityText}`.trim();
+
+            // Format time
+            const formatTime = (dateString) => {
+                if (!dateString) return 'Just now';
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+                if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                return date.toLocaleDateString();
+            };
+
+            return {
+                type,
+                title,
+                description: log.description || 'No description available',
+                time: formatTime(log.created_at)
+            };
+        });
+    };
+
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
@@ -58,9 +106,11 @@ const Dashboard = () => {
                 setSalesData([]);
             }
 
-            // Handle activities
+            // Handle activities - Transform backend format to frontend format
             if (results[2].status === 'fulfilled' && results[2].value?.success && results[2].value?.data) {
-                setActivities(Array.isArray(results[2].value.data) ? results[2].value.data : []);
+                const rawActivities = Array.isArray(results[2].value.data) ? results[2].value.data : [];
+                const transformedActivities = transformActivities(rawActivities);
+                setActivities(transformedActivities);
             } else {
                 console.warn('Using empty activities due to API error');
                 setActivities([]);
@@ -110,7 +160,7 @@ const Dashboard = () => {
                         color="cyan"
                     />
                     <MetricCard
-                        title="Stock Value"
+                        title="Current Stock Price"
                         value={`₹${(metrics?.totalStockValue || 0).toLocaleString()}`}
                         icon={DollarSign}
                         color="emerald"

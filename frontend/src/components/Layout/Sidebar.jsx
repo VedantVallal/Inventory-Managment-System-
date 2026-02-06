@@ -8,7 +8,8 @@ import {
     Users,
     Truck,
     FileText,
-    Settings
+    User,
+    CreditCard
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -19,8 +20,9 @@ const Sidebar = () => {
         { name: 'Purchases', path: '/purchases', icon: ShoppingBag },
         { name: 'Customers', path: '/customers', icon: Users },
         { name: 'Suppliers', path: '/suppliers', icon: Truck },
+        { name: 'POS Billing', path: '/pos', icon: CreditCard },
         { name: 'Reports', path: '/reports', icon: FileText },
-        { name: 'Settings', path: '/settings', icon: Settings },
+        { name: 'My Profile', path: '/my-profile', icon: User },
     ];
 
     return (

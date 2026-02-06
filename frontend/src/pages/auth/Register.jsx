@@ -162,6 +162,7 @@ const Register = () => {
                                     value={formData.password}
                                     onChange={handleChange}
                                     icon={Lock}
+                                    showPasswordToggle={true}
                                     required
                                     helperText="At least 6 characters"
                                 />
@@ -173,6 +174,7 @@ const Register = () => {
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
                                     icon={Lock}
+                                    showPasswordToggle={true}
                                     required
                                 />
                             </div>

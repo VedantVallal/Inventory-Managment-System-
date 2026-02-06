@@ -75,6 +75,7 @@ const customerRoutes = require('./routes/customerRoutes');
 const alertRoutes = require('./routes/alertRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const barcodeRoutes = require('./routes/barcodeRoutes');
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
@@ -88,6 +89,7 @@ app.use('/api/v1/customers', customerRoutes);
 app.use('/api/v1/alerts', alertRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/settings', settingsRoutes);
+app.use('/api/v1/barcode', barcodeRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFound);

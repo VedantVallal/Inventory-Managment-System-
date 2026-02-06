@@ -141,6 +141,7 @@ const Products = () => {
                         <div>
                             <h1 className="text-3xl font-heading font-bold text-navy mb-2">Products</h1>
                             <p className="text-text-muted">Manage your inventory products</p>
+                            <p className="text-sm font-medium text-cyan mt-1">Total Products: {products.length || 0}</p>
                         </div>
                         <Button variant="primary" icon={Plus} onClick={handleAddProduct}>
                             Add Product
@@ -169,10 +170,11 @@ const Products = () => {
                                 <thead>
                                     <tr className="border-b-2 border-gray-200 bg-bg-secondary">
                                         <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Product</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">SKU</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Stock</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Purchase Price</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Selling Price</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Stock Keeping Unit — unique product identifier">SKU</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">QR Code</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Available inventory stock">Quantity</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Cost price per unit">Purchase Price / Unit</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Selling price per unit">Selling Price / Unit</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Status</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Actions</th>
                                     </tr>
@@ -180,7 +182,7 @@ const Products = () => {
                                 <tbody>
                                     {!Array.isArray(filteredProducts) || filteredProducts.length === 0 ? (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-12 text-center text-text-muted">
+                                            <td colSpan="8" className="px-6 py-12 text-center text-text-muted">
                                                 No products found. Click "Add Product" to create one.
                                             </td>
                                         </tr>

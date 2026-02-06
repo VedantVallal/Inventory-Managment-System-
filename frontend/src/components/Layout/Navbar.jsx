@@ -274,9 +274,13 @@ const Navbar = () => {
                             <p className="text-sm font-medium text-text-primary">{user?.full_name || 'User'}</p>
                             <p className="text-xs text-text-muted capitalize">{user?.role || 'Admin'}</p>
                         </div>
-                        <div className="w-10 h-10 bg-cyan rounded-full flex items-center justify-center text-white font-semibold shadow-sm">
+                        <button
+                            onClick={() => navigate('/my-profile')}
+                            className="w-10 h-10 bg-cyan rounded-full flex items-center justify-center text-white font-semibold shadow-sm hover:bg-cyan-600 transition-colors cursor-pointer"
+                            title="View Profile"
+                        >
                             {user?.full_name?.charAt(0) || 'U'}
-                        </div>
+                        </button>
                         <button
                             onClick={handleLogout}
                             className="p-2 hover:bg-red-50 rounded-lg transition-colors ml-1"
