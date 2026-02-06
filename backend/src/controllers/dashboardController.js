@@ -39,54 +39,14 @@ const getDashboardMetrics = async (req, res) => {
 
         // Get today's sales
         const today = new Date().toISOString().split('T')[0];
-        const { data: todayBills } = await supabase
-            .from('bills')
-            .select(`
-                total_amount,
-                bill_items (
-                    quantity,
-                    unit_price,
-                    products (
-                        purchase_price
-                    )
-                )
-            `)
-            .eq('business_id', businessId)
-            .eq('bill_date', today);
-
-        const todaysSalesAmount = todayBills?.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0) || 0;
-        const todaysSalesCount = todayBills?.length || 0;
-
-        // Calculate today's profit (selling price - purchase price)
-        let todaysProfit = 0;
-        todayBills?.forEach(bill => {
-            bill.bill_items?.forEach(item => {
-                const sellingPrice = parseFloat(item.unit_price) * parseInt(item.quantity);
-                const purchasePrice = parseFloat(item.products?.purchase_price || 0) * parseInt(item.quantity);
-                todaysProfit += (sellingPrice - purchasePrice);
-            });
-        });
-
-        // Get yesterday's sales for comparison
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayDate = yesterday.toISOString().split('T')[0];
-
-        const { data: yesterdayBills } = await supabase
+        const { data: todaySales } = await supabase
             .from('bills')
             .select('total_amount')
             .eq('business_id', businessId)
-            .eq('bill_date', yesterdayDate);
+            .eq('bill_date', today);
 
-        const yesterdaysSalesAmount = yesterdayBills?.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0) || 0;
-
-        // Calculate sales trend
-        let salesTrend = 0;
-        if (yesterdaysSalesAmount > 0) {
-            salesTrend = ((todaysSalesAmount - yesterdaysSalesAmount) / yesterdaysSalesAmount) * 100;
-        } else if (todaysSalesAmount > 0) {
-            salesTrend = 100; // 100% increase if yesterday was 0
-        }
+        const todaysSalesAmount = todaySales?.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0) || 0;
+        const todaysSalesCount = todaySales?.length || 0;
 
         // Get this month's sales
         const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
@@ -97,9 +57,6 @@ const getDashboardMetrics = async (req, res) => {
             .gte('bill_date', firstDayOfMonth);
 
         const monthSalesAmount = monthSales?.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0) || 0;
-
-        // Calculate inventory breakdown
-        const inStockCount = lowStockProducts?.filter(p => p.current_stock > p.min_stock_level).length || 0;
 
         // Get total customers
         const { count: totalCustomers } = await supabase
@@ -121,24 +78,13 @@ const getDashboardMetrics = async (req, res) => {
             .eq('is_read', false);
 
         return sendSuccess(res, 200, 'Dashboard metrics retrieved successfully', {
-            // Product metrics
             totalProducts: totalProducts || 0,
-            inStockCount,
             lowStockAlerts: lowStockCount,
             outOfStockCount,
             totalStockValue: parseFloat(totalStockValue.toFixed(2)),
-
-            // Sales metrics
             todaySales: parseFloat(todaysSalesAmount.toFixed(2)),
-            todaysProfit: parseFloat(todaysProfit.toFixed(2)),
             todaysSalesCount,
-            yesterdaysSales: parseFloat(yesterdaysSalesAmount.toFixed(2)),
-            salesTrend: parseFloat(salesTrend.toFixed(2)),
-
-            // Monthly metrics
             monthSales: parseFloat(monthSalesAmount.toFixed(2)),
-
-            // Other metrics
             totalCustomers: totalCustomers || 0,
             totalSuppliers: totalSuppliers || 0,
             unreadAlerts: unreadAlerts || 0
