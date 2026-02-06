@@ -6,15 +6,10 @@ const TrustSection = () => {
         {
             icon: Shield,
             title: 'Your Data is Safe',
-            description: 'Protected with industry-standard security',
+            description: 'Protected with security',
             color: 'cyan'
         },
-        {
-            icon: Cloud,
-            title: 'Automatic Backup',
-            description: 'Never lose your data, backed up daily',
-            color: 'blue'
-        },
+       
         {
             icon: Monitor,
             title: 'Works Everywhere',
@@ -40,7 +35,7 @@ const TrustSection = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="max-w-6xl mx-auto">
                     {/* Section Header */}
-                    <div className="text-center mb-16">
+                    <div className="text-center mb-16 ">
                         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
                             Safe & Reliable
                         </h2>
@@ -50,7 +45,7 @@ const TrustSection = () => {
                     </div>
 
                     {/* Trust Points Grid */}
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 ml-60">
                         {trustPoints.map((point, index) => (
                             <div
                                 key={index}

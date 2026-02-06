@@ -23,7 +23,7 @@ const Features = () => {
         },
         {
             icon: Scan,
-            title: 'Barcode Support',
+            title: 'secure',
             description: 'Scan products quickly',
             gradient: 'from-green-500 to-teal-500'
         },

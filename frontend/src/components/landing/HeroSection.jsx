@@ -19,7 +19,7 @@ const HeroSection = () => {
                             {/* Badge */}
                             <div className="inline-flex items-center gap-2 bg-cyan-100 text-cyan-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
                                 <Sparkles size={16} />
-                                <span>Free for Small Shop Owners</span>
+                                <span>Built for Modern Businesses</span>
                             </div>
 
                             {/* Main Heading */}
@@ -30,7 +30,7 @@ const HeroSection = () => {
 
                             {/* Subheading */}
                             <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed">
-                                Add products, track stock, and create bills in seconds.
+                                Add products, track stock, and create bills in minutes.
                                 <span className="block mt-2 font-medium text-gray-700">
                                     Perfect for small shops and kirana stores.
                                 </span>
@@ -83,7 +83,7 @@ const HeroSection = () => {
                                                 <span className="text-2xl">🧾</span>
                                             </div>
                                             <div className="flex-1">
-                                                <p className="font-semibold text-gray-800">Bill #1234</p>
+                                                <p className="font-semibold text-gray-800">Bill</p>
                                                 <p className="text-sm text-gray-500">Today, 2:30 PM</p>
                                             </div>
                                             <p className="text-lg font-bold text-green-600">₹450</p>

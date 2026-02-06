@@ -15,7 +15,7 @@ const HowItWorks = () => {
         {
             icon: Receipt,
             title: 'Create Bill',
-            description: 'Manual or barcode billing',
+            description: 'Manually',
             color: 'purple',
             bgColor: 'bg-purple-100',
             iconColor: 'text-purple-600',

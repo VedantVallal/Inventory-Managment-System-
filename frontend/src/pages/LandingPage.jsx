@@ -13,7 +13,7 @@ const LandingPage = () => {
 
             {/* How It Works Section */}
             <HowItWorks />
-
+        <hr  className='mt-10 bg-blue-200 h-1'/>
             {/* Features Section */}
             <Features />
 

@@ -33,7 +33,7 @@ const POSBilling = () => {
 
     // Bill state
     const [billItems, setBillItems] = useState([]);
-    const [discount, setDiscount] = useState(0);
+    const [discountPercentage, setDiscountPercentage] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [currentBill, setCurrentBill] = useState(null);
     const [showReceipt, setShowReceipt] = useState(false);
@@ -155,8 +155,10 @@ const POSBilling = () => {
 
     // Calculate totals
     const subtotal = billItems.reduce((sum, item) => sum + item.total, 0);
-    const tax = subtotal * 0.18; // 18% GST
-    const total = subtotal + tax - discount;
+    const discountAmount = (subtotal * discountPercentage) / 100;
+    const taxableAmount = subtotal - discountAmount;
+    const tax = taxableAmount * 0.18; // 18% GST on TAXABLE amount
+    const total = taxableAmount + tax;
 
     // Complete payment
     const handleCompletePayment = async () => {
@@ -179,7 +181,7 @@ const POSBilling = () => {
                 paymentMethod: paymentMethod,
                 paymentStatus: 'paid',
                 paidAmount: total,
-                discountPercentage: 0,
+                discountPercentage: discountPercentage,
                 taxPercentage: 18,
                 notes: 'Manual POS Billing'
             };
@@ -200,7 +202,7 @@ const POSBilling = () => {
                     items: billItems,
                     subtotal: subtotal,
                     tax: tax,
-                    discount: discount,
+                    discount: discountAmount,
                     total: total,
                     paymentMethod: paymentMethod,
                     cashierName: 'Admin'
@@ -211,7 +213,7 @@ const POSBilling = () => {
 
                 // Clear bill
                 setBillItems([]);
-                setDiscount(0);
+                setDiscountPercentage(0);
 
                 toast.success('Payment completed successfully!');
 
@@ -429,14 +431,22 @@ const POSBilling = () => {
                             </div>
 
                             <div className="flex items-center justify-between">
-                                <label className="text-sm text-gray-600">Discount:</label>
-                                <input
-                                    type="number"
-                                    value={discount}
-                                    onChange={(e) => setDiscount(Math.max(0, parseFloat(e.target.value) || 0))}
-                                    className="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan"
-                                    placeholder="0.00"
-                                />
+                                <label className="text-sm text-gray-600">Discount (%):</label>
+                                <div className="relative w-24">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={discountPercentage}
+                                        onChange={(e) => {
+                                            const val = parseFloat(e.target.value) || 0;
+                                            setDiscountPercentage(Math.min(100, Math.max(0, val)));
+                                        }}
+                                        className="w-full pl-2 pr-6 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan"
+                                        placeholder="0"
+                                    />
+                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">%</span>
+                                </div>
                             </div>
 
                             <div className="pt-2 border-t border-gray-200">
