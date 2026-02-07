@@ -2,8 +2,8 @@ import api from './api';
 
 const saleService = {
     // Get all sales/bills
-    getAll: async () => {
-        return await api.get('/sales');
+    getAll: async (params) => {
+        return await api.get('/sales', { params });
     },
 
     // Get single sale by ID

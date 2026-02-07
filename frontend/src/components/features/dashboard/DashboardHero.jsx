@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, DollarSign, FileText, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { TrendingUp, IndianRupee, FileText, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { formatCurrency } from '../../../utils/currency';
 
 const MetricCard = ({ title, value, subtext, trend, icon: Icon, color, isAlert }) => (
@@ -49,7 +49,7 @@ const DashboardHero = ({ metrics }) => {
             <MetricCard
                 title="Today's Profit"
                 value={formatCurrency(metrics?.todayProfit || 0)}
-                icon={DollarSign}
+                icon={IndianRupee}
                 color="emerald"
                 trend={8} // Placeholder
                 subtext="Healthy margin"

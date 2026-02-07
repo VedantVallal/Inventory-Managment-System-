@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, DollarSign, ShoppingCart, AlertTriangle } from 'lucide-react';
+import { Package, IndianRupee, ShoppingCart, AlertTriangle } from 'lucide-react';
 import dashboardService from '../services/dashboard.service';
 import MetricCard from '../components/features/dashboard/MetricCard';
 import SalesChart from '../components/features/dashboard/SalesChart';
@@ -162,7 +162,7 @@ const Dashboard = () => {
                     <MetricCard
                         title="Current Stock Price"
                         value={`₹${(metrics?.totalStockValue || 0).toLocaleString()}`}
-                        icon={DollarSign}
+                        icon={IndianRupee}
                         color="emerald"
                     />
                     <MetricCard

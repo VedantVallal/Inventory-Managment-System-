@@ -80,7 +80,7 @@ const Purchases = () => {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b-2 border-gray-200 bg-bg-secondary">
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Purchase #</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">No.</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Date</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Supplier</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Total Qty</th>
@@ -97,13 +97,13 @@ const Purchases = () => {
                                         </td>
                                     </tr>
                                 ) : (
-                                    purchases.map((purchase) => (
+                                    purchases.map((purchase, index) => (
                                         <tr
                                             key={purchase.id}
                                             className="border-b border-gray-200 hover:bg-bg-primary transition-colors"
                                         >
                                             <td className="px-6 py-4 font-medium text-text-primary">
-                                                #{purchase.purchase_number || purchase.id.slice(0, 8)}
+                                                {index + 1}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-text-secondary">
                                                 {new Date(purchase.purchase_date).toLocaleDateString()}

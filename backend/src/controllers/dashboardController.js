@@ -11,118 +11,134 @@ const getDashboardMetrics = async (req, res) => {
     try {
         const businessId = req.user.businessId;
 
-        // Get total products count
-        const { count: totalProducts } = await supabase
-            .from('products')
-            .select('*', { count: 'exact', head: true })
-            .eq('business_id', businessId)
-            .eq('is_active', true);
+        // Helper to get local date string YYYY-MM-DD
+        const getLocalDateString = (date) => {
+            const offset = date.getTimezoneOffset() * 60000;
+            const localDate = new Date(date.getTime() - offset);
+            return localDate.toISOString().split('T')[0];
+        };
 
-        // Get low stock items count
-        const { data: lowStockProducts } = await supabase
-            .from('products')
-            .select('id, current_stock, min_stock_level')
-            .eq('business_id', businessId)
-            .eq('is_active', true);
+        const today = new Date();
+        const todayStr = getLocalDateString(today);
 
-        const lowStockCount = lowStockProducts?.filter(p => p.current_stock < p.min_stock_level).length || 0;
-        const outOfStockCount = lowStockProducts?.filter(p => p.current_stock === 0).length || 0;
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = getLocalDateString(yesterday);
 
-        // Get total stock value
-        const { data: products } = await supabase
-            .from('products')
-            .select('current_stock, purchase_price')
-            .eq('business_id', businessId)
-            .eq('is_active', true);
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const firstDayOfMonthStr = getLocalDateString(firstDayOfMonth);
 
-        const totalStockValue = products?.reduce((sum, p) => sum + (p.current_stock * p.purchase_price), 0) || 0;
+        // Run queries in parallel
+        const [
+            productsResult,
+            todayBillsResult,
+            yesterdayBillsResult,
+            monthBillsResult,
+            customersResult,
+            suppliersResult,
+            alertsResult
+        ] = await Promise.all([
+            // 1. Products (Total, Low Stock, Stock Value)
+            supabase
+                .from('products')
+                .select('current_stock, min_stock_level, purchase_price')
+                .eq('business_id', businessId)
+                .eq('is_active', true)
+                .then(res => res.data || []),
 
-        // Get today's sales
-        const today = new Date().toISOString().split('T')[0];
-        const { data: todayBills } = await supabase
-            .from('bills')
-            .select(`
-                total_amount,
-                bill_items (
-                    quantity,
-                    unit_price,
-                    products (
-                        purchase_price
+            // 2. Today's Bills
+            supabase
+                .from('bills')
+                .select(`
+                    total_amount,
+                    bill_items (
+                        quantity,
+                        unit_price,
+                        products (
+                            purchase_price
+                        )
                     )
-                )
-            `)
-            .eq('business_id', businessId)
-            .eq('bill_date', today);
+                `)
+                .eq('business_id', businessId)
+                .eq('bill_date', todayStr)
+                .then(res => res.data || []),
 
-        const todaysSalesAmount = todayBills?.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0) || 0;
-        const todaysSalesCount = todayBills?.length || 0;
+            // 3. Yesterday's Bills (for trend)
+            supabase
+                .from('bills')
+                .select('total_amount')
+                .eq('business_id', businessId)
+                .eq('bill_date', yesterdayStr)
+                .then(res => res.data || []),
 
-        // Calculate today's profit (selling price - purchase price)
+            // 4. Month's Bills
+            supabase
+                .from('bills')
+                .select('total_amount')
+                .eq('business_id', businessId)
+                .gte('bill_date', firstDayOfMonthStr)
+                .then(res => res.data || []),
+
+            // 5. Customers Count
+            supabase
+                .from('customers')
+                .select('*', { count: 'exact', head: true })
+                .eq('business_id', businessId)
+                .then(res => res.count || 0),
+
+            // 6. Suppliers Count
+            supabase
+                .from('suppliers')
+                .select('*', { count: 'exact', head: true })
+                .eq('business_id', businessId)
+                .then(res => res.count || 0),
+
+            // 7. Unread Alerts
+            supabase
+                .from('alerts')
+                .select('*', { count: 'exact', head: true })
+                .eq('business_id', businessId)
+                .eq('is_read', false)
+                .then(res => res.count || 0)
+        ]);
+
+
+        // Process Products Data
+        const totalProducts = productsResult.length;
+        const lowStockCount = productsResult.filter(p => p.current_stock < p.min_stock_level).length;
+        const outOfStockCount = productsResult.filter(p => p.current_stock === 0).length;
+        const inStockCount = productsResult.filter(p => p.current_stock > p.min_stock_level).length;
+        const totalStockValue = productsResult.reduce((sum, p) => sum + (p.current_stock * p.purchase_price), 0);
+
+        // Process Sales Data
+        const todaysSalesAmount = todayBillsResult.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0);
+        const todaysSalesCount = todayBillsResult.length;
+
         let todaysProfit = 0;
-        todayBills?.forEach(bill => {
-            bill.bill_items?.forEach(item => {
-                const sellingPrice = parseFloat(item.unit_price) * parseInt(item.quantity);
-                const purchasePrice = parseFloat(item.products?.purchase_price || 0) * parseInt(item.quantity);
-                todaysProfit += (sellingPrice - purchasePrice);
-            });
+        todayBillsResult.forEach(bill => {
+            if (bill.bill_items) {
+                bill.bill_items.forEach(item => {
+                    const sellingPrice = parseFloat(item.unit_price) * parseInt(item.quantity);
+                    const purchasePrice = parseFloat(item.products?.purchase_price || 0) * parseInt(item.quantity);
+                    todaysProfit += (sellingPrice - purchasePrice);
+                });
+            }
         });
 
-        // Get yesterday's sales for comparison
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayDate = yesterday.toISOString().split('T')[0];
-
-        const { data: yesterdayBills } = await supabase
-            .from('bills')
-            .select('total_amount')
-            .eq('business_id', businessId)
-            .eq('bill_date', yesterdayDate);
-
-        const yesterdaysSalesAmount = yesterdayBills?.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0) || 0;
+        const yesterdaysSalesAmount = yesterdayBillsResult.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0);
+        const monthSalesAmount = monthBillsResult.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0);
 
         // Calculate sales trend
         let salesTrend = 0;
         if (yesterdaysSalesAmount > 0) {
             salesTrend = ((todaysSalesAmount - yesterdaysSalesAmount) / yesterdaysSalesAmount) * 100;
         } else if (todaysSalesAmount > 0) {
-            salesTrend = 100; // 100% increase if yesterday was 0
+            salesTrend = 100;
         }
-
-        // Get this month's sales
-        const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-        const { data: monthSales } = await supabase
-            .from('bills')
-            .select('total_amount')
-            .eq('business_id', businessId)
-            .gte('bill_date', firstDayOfMonth);
-
-        const monthSalesAmount = monthSales?.reduce((sum, bill) => sum + parseFloat(bill.total_amount), 0) || 0;
-
-        // Calculate inventory breakdown
-        const inStockCount = lowStockProducts?.filter(p => p.current_stock > p.min_stock_level).length || 0;
-
-        // Get total customers
-        const { count: totalCustomers } = await supabase
-            .from('customers')
-            .select('*', { count: 'exact', head: true })
-            .eq('business_id', businessId);
-
-        // Get total suppliers
-        const { count: totalSuppliers } = await supabase
-            .from('suppliers')
-            .select('*', { count: 'exact', head: true })
-            .eq('business_id', businessId);
-
-        // Get unread alerts count
-        const { count: unreadAlerts } = await supabase
-            .from('alerts')
-            .select('*', { count: 'exact', head: true })
-            .eq('business_id', businessId)
-            .eq('is_read', false);
 
         return sendSuccess(res, 200, 'Dashboard metrics retrieved successfully', {
             // Product metrics
-            totalProducts: totalProducts || 0,
+            totalProducts,
             inStockCount,
             lowStockAlerts: lowStockCount,
             outOfStockCount,
@@ -139,9 +155,9 @@ const getDashboardMetrics = async (req, res) => {
             monthSales: parseFloat(monthSalesAmount.toFixed(2)),
 
             // Other metrics
-            totalCustomers: totalCustomers || 0,
-            totalSuppliers: totalSuppliers || 0,
-            unreadAlerts: unreadAlerts || 0
+            totalCustomers: customersResult,
+            totalSuppliers: suppliersResult,
+            unreadAlerts: alertsResult
         });
 
     } catch (error) {
@@ -200,15 +216,26 @@ const getSalesChartData = async (req, res) => {
         const businessId = req.user.businessId;
         const { days = 7 } = req.query;
 
+        // Helper to get local date string YYYY-MM-DD
+        const getLocalDateString = (date) => {
+            const offset = date.getTimezoneOffset() * 60000;
+            const localDate = new Date(date.getTime() - offset);
+            return localDate.toISOString().split('T')[0];
+        };
+
+        const endDate = new Date();
         const startDate = new Date();
-        startDate.setDate(startDate.getDate() - parseInt(days));
-        const startDateStr = startDate.toISOString().split('T')[0];
+        startDate.setDate(startDate.getDate() - parseInt(days) + 1);
+
+        const startDateStr = getLocalDateString(startDate);
+        const endDateStr = getLocalDateString(endDate);
 
         const { data: sales, error } = await supabase
             .from('bills')
             .select('bill_date, total_amount')
             .eq('business_id', businessId)
             .gte('bill_date', startDateStr)
+            .lte('bill_date', endDateStr)
             .order('bill_date', { ascending: true });
 
         if (error) {
@@ -216,17 +243,23 @@ const getSalesChartData = async (req, res) => {
             return sendError(res, 500, 'Failed to fetch sales data', error.message);
         }
 
-        // Group by date
+        // Initialize object with 0 for all dates in range
         const chartData = {};
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const dateStr = getLocalDateString(d);
+            chartData[dateStr] = 0;
+        }
+
+        // Fill with actual data
         sales?.forEach(sale => {
             const date = sale.bill_date;
-            if (!chartData[date]) {
-                chartData[date] = 0;
+            if (chartData.hasOwnProperty(date)) {
+                chartData[date] += parseFloat(sale.total_amount);
             }
-            chartData[date] += parseFloat(sale.total_amount);
         });
 
-        const formattedData = Object.keys(chartData).map(date => ({
+        // Convert to array
+        const formattedData = Object.keys(chartData).sort().map(date => ({
             date,
             sales: parseFloat(chartData[date].toFixed(2))
         }));

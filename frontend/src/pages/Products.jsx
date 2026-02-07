@@ -170,11 +170,10 @@ const Products = () => {
                                 <thead>
                                     <tr className="border-b-2 border-gray-200 bg-bg-secondary">
                                         <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Product</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Stock Keeping Unit — unique product identifier">SKU</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">QR Code</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Available inventory stock">Quantity</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Cost price per unit">Purchase Price / Unit</th>
-                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Selling price per unit">Selling Price / Unit</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary" title="Stock Keeping Unit">SKU ( Stock Keeping Unit )</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Quantity</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Purchase Price</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Selling Price</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Status</th>
                                         <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Actions</th>
                                     </tr>
@@ -182,7 +181,7 @@ const Products = () => {
                                 <tbody>
                                     {!Array.isArray(filteredProducts) || filteredProducts.length === 0 ? (
                                         <tr>
-                                            <td colSpan="8" className="px-6 py-12 text-center text-text-muted">
+                                            <td colSpan="7" className="px-6 py-12 text-center text-text-muted">
                                                 No products found. Click "Add Product" to create one.
                                             </td>
                                         </tr>
@@ -210,7 +209,6 @@ const Products = () => {
                                                             <AlertTriangle size={16} className="text-yellow-600" />
                                                         )}
                                                     </div>
-                                                    <p className="text-xs text-text-muted">Min: {product.min_stock_level}</p>
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-text-secondary">
                                                     ₹{parseFloat(product.purchase_price).toLocaleString()}

@@ -195,9 +195,8 @@ const createBill = async (req, res) => {
         }
 
         const nextBillNumber = (count || 0) + 1;
-        // Add timestamp component to ensure uniqueness even if count is off
-        const timestamp = Date.now().toString().slice(-4);
-        const billNumber = `${billPrefix}-${new Date().toISOString().slice(0, 7).replace('-', '')}-${String(nextBillNumber).padStart(4, '0')}-${timestamp}`;
+        // Simple sequential bill number as requested
+        const billNumber = nextBillNumber.toString();
 
         // Calculate totals
         let subtotal = 0;

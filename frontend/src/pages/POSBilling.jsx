@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Minus, Trash2, Search, DollarSign, Printer, Download } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, Search, IndianRupee, Printer, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import productService from '../services/product.service';
@@ -476,7 +476,7 @@ const POSBilling = () => {
                             onClick={handleCompletePayment}
                             disabled={billItems.length === 0 || loading}
                         >
-                            <DollarSign size={20} />
+                            <IndianRupee size={20} />
                             Complete Payment
                         </Button>
                     </div>

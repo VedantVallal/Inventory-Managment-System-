@@ -18,9 +18,8 @@ const Sidebar = () => {
         { name: 'Products', path: '/products', icon: Package },
         { name: 'Sales', path: '/sales', icon: ShoppingCart },
         { name: 'Purchases', path: '/purchases', icon: ShoppingBag },
-        { name: 'Customers', path: '/customers', icon: Users },
         { name: 'Suppliers', path: '/suppliers', icon: Truck },
-        { name: 'POS Billing', path: '/pos', icon: CreditCard },
+        { name: 'Billing', path: '/pos', icon: CreditCard },
         { name: 'Reports', path: '/reports', icon: FileText },
         { name: 'My Profile', path: '/my-profile', icon: User },
     ];

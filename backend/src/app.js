@@ -71,7 +71,7 @@ const saleRoutes = require('./routes/saleRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const purchaseRoutes = require('./routes/purchaseRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
-const customerRoutes = require('./routes/customerRoutes');
+
 const alertRoutes = require('./routes/alertRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
@@ -85,7 +85,7 @@ app.use('/api/v1/sales', saleRoutes); // Alias for bills
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/purchases', purchaseRoutes);
 app.use('/api/v1/suppliers', supplierRoutes);
-app.use('/api/v1/customers', customerRoutes);
+
 app.use('/api/v1/alerts', alertRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/settings', settingsRoutes);

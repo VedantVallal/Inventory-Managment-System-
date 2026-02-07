@@ -28,9 +28,8 @@ const Receipt = forwardRef(({ bill }, ref) => {
             <div style={{ textAlign: 'center', marginBottom: '10px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>
                 <h1 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0 0 5px 0' }}>STOCKFLOW</h1>
                 <p style={{ margin: '2px 0', fontSize: '11px' }}>Inventory Management System</p>
-                <p style={{ margin: '2px 0', fontSize: '10px' }}>123 Main Street, City - 400001</p>
-                <p style={{ margin: '2px 0', fontSize: '10px' }}>Phone: +91 1234567890</p>
-                <p style={{ margin: '2px 0', fontSize: '10px' }}>GSTIN: 27XXXXX1234X1ZX</p>
+                <p style={{ margin: '2px 0', fontSize: '10px' }}>123 Main Street</p>
+                <p style={{ margin: '2px 0', fontSize: '10px' }}>City: Solapur, PIN: 413002</p>
             </div>
 
             {/* Bill Info */}
@@ -126,14 +125,6 @@ const Receipt = forwardRef(({ bill }, ref) => {
                 <p style={{ margin: '5px 0', fontSize: '10px' }}>
                     For queries: support@stockflow.com
                 </p>
-            </div>
-
-            {/* Barcode/QR (optional) */}
-            <div style={{ textAlign: 'center', marginTop: '15px', paddingTop: '10px', borderTop: '1px dashed #000' }}>
-                <p style={{ fontSize: '10px', margin: '5px 0' }}>Scan for digital receipt</p>
-                <div style={{ height: '40px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '5px 0' }}>
-                    <span style={{ fontSize: '9px', color: '#666' }}>[QR CODE PLACEHOLDER]</span>
-                </div>
             </div>
         </div>
     );

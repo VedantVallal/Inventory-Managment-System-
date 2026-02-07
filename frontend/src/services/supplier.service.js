@@ -2,8 +2,8 @@ import api from './api';
 
 const supplierService = {
     // Get all suppliers
-    getAll: async () => {
-        return await api.get('/suppliers');
+    getAll: async (params) => {
+        return await api.get('/suppliers', { params });
     },
 
     // Get single supplier

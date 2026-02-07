@@ -12,6 +12,11 @@ export const AuthProvider = ({ children }) => {
         const storedUser = authService.getUser();
         if (storedUser) {
             setUser(storedUser);
+            // If we are on login or register page, redirect to dashboard
+            const path = window.location.pathname;
+            if (path === '/login' || path === '/register') {
+                window.location.href = '/dashboard';
+            }
         }
         setLoading(false);
     }, []);

@@ -237,15 +237,15 @@ const Suppliers = () => {
             >
                 <div className="space-y-4">
                     <Input
-                        label="Supplier Name *"
+                        label="Supplier Shop Name *"
                         type="text"
                         value={formData.supplierName}
                         onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
-                        placeholder="Enter supplier name"
+                        placeholder="Enter shop name"
                     />
 
                     <Input
-                        label="Contact Person"
+                        label="Contact Person Name"
                         type="text"
                         value={formData.contactPerson}
                         onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
@@ -253,11 +253,14 @@ const Suppliers = () => {
                     />
 
                     <Input
-                        label="Phone *"
+                        label="Phone Number (10 digits) *"
                         type="tel"
                         value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="Enter phone number"
+                        onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                            setFormData({ ...formData, phone: val });
+                        }}
+                        placeholder="Enter 10-digit phone number"
                     />
 
                     <Input

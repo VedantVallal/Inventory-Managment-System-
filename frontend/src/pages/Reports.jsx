@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Package, ShoppingCart, Users, DollarSign, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Package, ShoppingCart, Users, IndianRupee, AlertTriangle } from 'lucide-react';
 import Card from '../components/common/Card';
 import Badge from '../components/common/Badge';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -78,10 +78,15 @@ const Reports = () => {
 
     const salesTrendData = sales
         .slice(-7)
-        .map(sale => ({
-            date: new Date(sale.sale_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            amount: parseFloat(sale.total_amount),
-        }));
+        .map(sale => {
+            const date = new Date(sale.bill_date);
+            return {
+                date: !isNaN(date.getTime())
+                    ? date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+                    : 'N/A',
+                amount: parseFloat(sale.total_amount) || 0,
+            };
+        });
 
     if (loading) {
         return (
@@ -109,7 +114,7 @@ const Reports = () => {
                                 <p className="text-2xl font-bold text-text-primary">₹{metrics.totalSales.toLocaleString()}</p>
                             </div>
                             <div className="p-3 bg-emerald-50 rounded-lg">
-                                <DollarSign className="text-emerald-600" size={24} />
+                                <IndianRupee className="text-emerald-600" size={24} />
                             </div>
                         </div>
                     </Card>

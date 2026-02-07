@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Search } from 'lucide-react';
 import productService from '../services/product.service';
-import customerService from '../services/customer.service';
+
 import saleService from '../services/sale.service';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
@@ -12,16 +12,13 @@ import { useNavigate } from 'react-router-dom';
 const CreateSale = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
-    const [customers, setCustomers] = useState([]);
     const [cart, setCart] = useState([]);
-    const [selectedCustomer, setSelectedCustomer] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetchProducts();
-        fetchCustomers();
     }, []);
 
     const fetchProducts = async () => {
@@ -36,16 +33,7 @@ const CreateSale = () => {
         }
     };
 
-    const fetchCustomers = async () => {
-        try {
-            const response = await customerService.getAll();
-            if (response.success && response.data && Array.isArray(response.data.customers)) {
-                setCustomers(response.data.customers);
-            }
-        } catch (error) {
-            console.error('Error fetching customers:', error);
-        }
-    };
+
 
     const addToCart = (product) => {
         const existingItem = cart.find(item => item.product_id === product.id);
@@ -113,7 +101,7 @@ const CreateSale = () => {
             const totalAmount = calculateTotal();
 
             const saleData = {
-                customerId: selectedCustomer || null,
+                customerId: null,
                 paymentMethod,
                 paymentStatus: 'paid',
                 paidAmount: totalAmount, // Add paid amount for complete payment
@@ -195,24 +183,7 @@ const CreateSale = () => {
                         <Card>
                             <h3 className="text-lg font-semibold text-text-primary mb-4">Cart</h3>
 
-                            {/* Customer Selection */}
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-text-primary mb-2">
-                                    Customer (Optional)
-                                </label>
-                                <select
-                                    value={selectedCustomer}
-                                    onChange={(e) => setSelectedCustomer(e.target.value)}
-                                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan focus:border-transparent"
-                                >
-                                    <option value="">Walk-in Customer</option>
-                                    {customers.map(customer => (
-                                        <option key={customer.id} value={customer.id}>
-                                            {customer.customer_name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+
 
                             {/* Payment Method */}
                             <div className="mb-4">

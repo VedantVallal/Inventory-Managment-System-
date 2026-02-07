@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, User, Building, Phone, MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -20,6 +20,15 @@ const Register = () => {
         password: '',
         confirmPassword: '',
     });
+
+    // Redirect if already logged in
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            toast('You are already logged in.', { icon: '🔒' });
+            navigate('/dashboard', { replace: true });
+        }
+    }, [navigate]);
 
     const handleChange = (e) => {
         setFormData({

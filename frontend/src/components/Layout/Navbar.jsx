@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, User, LogOut, Search as SearchIcon, X, Package, Users, FileText } from 'lucide-react';
+import { Bell, LogOut, Search as SearchIcon, X, Package, Users, FileText, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import alertService from '../../services/alert.service';
 import productService from '../../services/product.service';
-import customerService from '../../services/customer.service';
+import supplierService from '../../services/supplier.service';
 import saleService from '../../services/sale.service';
-
+import purchaseService from '../../services/purchase.service';
 
 
 const Navbar = () => {
@@ -80,6 +80,21 @@ const Navbar = () => {
         }
     };
 
+    const handleMarkAllRead = async () => {
+        try {
+            // Optimistically update UI
+            setAlerts(prev => prev.map(a => ({ ...a, is_read: true })));
+            setUnreadCount(0);
+
+            // Call API for each unread alert
+            const unreadAlerts = alerts.filter(a => !a.is_read);
+            await Promise.all(unreadAlerts.map(a => alertService.markAsRead(a.id)));
+        } catch (error) {
+            console.error('Error marking all as read:', error);
+            fetchAlerts(); // Revert on error
+        }
+    };
+
     // Search Logic
     useEffect(() => {
         const delaySearch = setTimeout(() => {
@@ -98,14 +113,18 @@ const Navbar = () => {
         setIsSearching(true);
         setShowSearchDropdown(true);
         try {
-            const [productsRes, customersRes] = await Promise.all([
+            const [productsRes, suppliersRes, salesRes, purchasesRes] = await Promise.all([
                 productService.getAll({ search: searchQuery, limit: 3 }),
-                customerService.getAll({ search: searchQuery }), // limit not supported in customer controller yet but small dataset likely
+                supplierService.getAll({ search: searchQuery }),
+                saleService.getAll({ search: searchQuery, limit: 3 }),
+                purchaseService.getAll({ search: searchQuery, limit: 3 }),
             ]);
 
             setSearchResults({
                 products: productsRes.success ? productsRes.data.products.slice(0, 3) : [],
-                customers: customersRes.success ? customersRes.data.customers.slice(0, 3) : [],
+                suppliers: suppliersRes.success ? suppliersRes.data.suppliers.slice(0, 3) : [],
+                bills: salesRes.success ? salesRes.data.bills.slice(0, 3) : [],
+                purchases: purchasesRes.success ? purchasesRes.data.purchases.slice(0, 3) : [],
             });
         } catch (error) {
             console.error('Search error:', error);
@@ -131,7 +150,7 @@ const Navbar = () => {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => searchQuery.length > 1 && setShowSearchDropdown(true)}
-                            placeholder="Search products, customers..."
+                            placeholder="Search products, suppliers, bills, purchases..."
                             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan focus:border-transparent transition-shadow"
                         />
                         {searchQuery && (
@@ -158,7 +177,7 @@ const Navbar = () => {
                                             {searchResults.products.map(p => (
                                                 <div
                                                     key={p.id}
-                                                    onClick={() => navigate('/products')} // Ideally go to product detail but we might not have that page yet
+                                                    onClick={() => navigate('/products')}
                                                     className="flex items-center gap-3 p-2 hover:bg-bg-secondary rounded cursor-pointer group"
                                                 >
                                                     <div className="w-8 h-8 rounded bg-cyan/10 flex items-center justify-center text-cyan">
@@ -173,22 +192,66 @@ const Navbar = () => {
                                         </div>
                                     )}
 
-                                    {/* Customers */}
-                                    {searchResults.customers?.length > 0 && (
+                                    {/* Suppliers */}
+                                    {searchResults.suppliers?.length > 0 && (
                                         <div className="p-2 border-t border-gray-100">
-                                            <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 px-2">Customers</div>
-                                            {searchResults.customers.map(c => (
+                                            <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 px-2">Suppliers</div>
+                                            {searchResults.suppliers.map(s => (
                                                 <div
-                                                    key={c.id}
-                                                    onClick={() => navigate('/customers')}
+                                                    key={s.id}
+                                                    onClick={() => navigate('/suppliers')}
                                                     className="flex items-center gap-3 p-2 hover:bg-bg-secondary rounded cursor-pointer group"
                                                 >
-                                                    <div className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-600">
+                                                    <div className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-600">
                                                         <Users size={16} />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-medium text-text-primary group-hover:text-purple-600 transition-colors">{c.customer_name}</p>
-                                                        <p className="text-xs text-text-muted">{c.phone}</p>
+                                                        <p className="text-sm font-medium text-text-primary group-hover:text-blue-600 transition-colors">{s.supplier_name}</p>
+                                                        <p className="text-xs text-text-muted">{s.phone}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Bills */}
+                                    {searchResults.bills?.length > 0 && (
+                                        <div className="p-2 border-t border-gray-100">
+                                            <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 px-2">Bills</div>
+                                            {searchResults.bills.map(b => (
+                                                <div
+                                                    key={b.id}
+                                                    onClick={() => navigate(`/sales`)}
+                                                    className="flex items-center gap-3 p-2 hover:bg-bg-secondary rounded cursor-pointer group"
+                                                >
+                                                    <div className="w-8 h-8 rounded bg-green-100 flex items-center justify-center text-green-600">
+                                                        <FileText size={16} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-text-primary group-hover:text-green-600 transition-colors">Bill #{b.bill_number}</p>
+                                                        <p className="text-xs text-text-muted">Total: ₹{parseFloat(b.total_amount).toFixed(2)}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Purchases */}
+                                    {searchResults.purchases?.length > 0 && (
+                                        <div className="p-2 border-t border-gray-100">
+                                            <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 px-2">Purchases</div>
+                                            {searchResults.purchases.map(p => (
+                                                <div
+                                                    key={p.id}
+                                                    onClick={() => navigate(`/purchases`)}
+                                                    className="flex items-center gap-3 p-2 hover:bg-bg-secondary rounded cursor-pointer group"
+                                                >
+                                                    <div className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-600">
+                                                        <ShoppingBag size={16} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-text-primary group-hover:text-purple-600 transition-colors">Purchase #{p.invoice_number}</p>
+                                                        <p className="text-xs text-text-muted">Total: ₹{parseFloat(p.total_amount).toFixed(2)}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -196,12 +259,15 @@ const Navbar = () => {
                                     )}
 
                                     {/* No Results */}
-                                    {searchResults.products?.length === 0 && searchResults.customers?.length === 0 && (
-                                        <div className="p-8 text-center text-text-muted">
-                                            <SearchIcon className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                                            <p>No results found for "{searchQuery}"</p>
-                                        </div>
-                                    )}
+                                    {searchResults.products?.length === 0 &&
+                                        searchResults.suppliers?.length === 0 &&
+                                        searchResults.bills?.length === 0 &&
+                                        searchResults.purchases?.length === 0 && (
+                                            <div className="p-8 text-center text-text-muted">
+                                                <SearchIcon className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                                <p>No results found for "{searchQuery}"</p>
+                                            </div>
+                                        )}
                                 </>
                             )}
                         </div>
@@ -230,7 +296,10 @@ const Navbar = () => {
                                 <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                                     <h3 className="font-semibold text-text-primary">Notifications</h3>
                                     {unreadCount > 0 && (
-                                        <button className="text-xs text-cyan hover:text-cyan-700 font-medium">
+                                        <button
+                                            onClick={handleMarkAllRead}
+                                            className="text-xs text-cyan hover:text-cyan-700 font-medium"
+                                        >
                                             Mark all read
                                         </button>
                                     )}

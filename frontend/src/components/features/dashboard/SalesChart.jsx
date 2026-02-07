@@ -12,12 +12,20 @@ const SalesChart = ({ data }) => {
                         dataKey="date"
                         stroke="#94A3B8"
                         style={{ fontSize: '12px' }}
+                        tickFormatter={(value) => {
+                            if (!value) return '';
+                            const date = new Date(value);
+                            if (isNaN(date.getTime())) return value;
+                            return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+                        }}
                     />
                     <YAxis
                         stroke="#94A3B8"
                         style={{ fontSize: '12px' }}
+                        tickFormatter={(value) => `₹${value}`}
                     />
                     <Tooltip
+                        formatter={(value) => [`₹${value}`, 'Sales']}
                         contentStyle={{
                             backgroundColor: '#fff',
                             border: '1px solid #E2E8F0',

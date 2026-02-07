@@ -1,5 +1,6 @@
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
@@ -11,7 +12,6 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Sales from './pages/Sales';
 import CreateSale from './pages/CreateSale';
-import Customers from './pages/Customers';
 import Suppliers from './pages/Suppliers';
 import Purchases from './pages/Purchases';
 import CreatePurchase from './pages/CreatePurchase';
@@ -21,6 +21,22 @@ import POSBilling from './pages/POSBilling';
 import LandingPage from './pages/LandingPage';
 
 function App() {
+  // Prevent back navigation to login when authenticated
+  useEffect(() => {
+    const handlePopState = (event) => {
+      const token = localStorage.getItem('token');
+      if (token && (window.location.pathname === '/login' || window.location.pathname === '/register')) {
+        // User is logged in but tried to go back to login/register
+        event.preventDefault();
+        window.history.pushState(null, '', '/dashboard');
+        window.location.href = '/dashboard';
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
@@ -77,16 +93,7 @@ function App() {
             }
           />
 
-          <Route
-            path="/customers"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Customers />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
+
 
           <Route
             path="/suppliers"

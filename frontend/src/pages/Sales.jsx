@@ -85,9 +85,6 @@ const Sales = () => {
                         <h1 className="text-3xl font-heading font-bold text-navy mb-2">Sales</h1>
                         <p className="text-text-muted">Manage your sales and invoices</p>
                     </div>
-                    <Button variant="primary" icon={Plus} onClick={() => navigate('/sales/create')}>
-                        New Sale
-                    </Button>
                 </div>
 
                 {/* Sales Table */}
@@ -113,7 +110,7 @@ const Sales = () => {
                                         </td>
                                     </tr>
                                 ) : (
-                                    sales.map((sale) => {
+                                    sales.map((sale, index) => {
                                         const badge = getPaymentBadge(sale.payment_method);
                                         return (
                                             <tr
@@ -121,10 +118,10 @@ const Sales = () => {
                                                 className="border-b border-gray-200 hover:bg-bg-primary transition-colors"
                                             >
                                                 <td className="px-6 py-4 font-medium text-text-primary">
-                                                    #{sale.invoice_number}
+                                                    {index + 1}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-text-secondary">
-                                                    {new Date(sale.sale_date).toLocaleDateString()}
+                                                    {new Date(sale.bill_date).toLocaleDateString('en-IN')}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-text-secondary">
                                                     {sale.customers?.customer_name || 'Walk-in'}

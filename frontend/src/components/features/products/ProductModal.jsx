@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from '../../common/Modal';
 import Input from '../../common/Input';
 import Button from '../../common/Button';
-import { Package, DollarSign, Hash, AlertTriangle } from 'lucide-react';
+import { Package, IndianRupee, Hash, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const ProductModal = ({ isOpen, onClose, onSave, product }) => {
@@ -89,10 +89,10 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         required
                     />
                     <Input
-                        label="SKU"
+                        label="SKU (Stock Keeping Unit)"
                         type="text"
                         name="sku"
-                        placeholder="Enter SKU"
+                        placeholder="e.g., PROD-001, SKU-12345"
                         value={formData.sku}
                         onChange={handleChange}
                         icon={Hash}
@@ -109,7 +109,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         placeholder="Enter purchase price"
                         value={formData.purchasePrice}
                         onChange={handleChange}
-                        icon={DollarSign}
+                        icon={IndianRupee}
                         required
                         min="0"
                         step="0.01"
@@ -121,7 +121,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product }) => {
                         placeholder="Enter selling price"
                         value={formData.sellingPrice}
                         onChange={handleChange}
-                        icon={DollarSign}
+                        icon={IndianRupee}
                         required
                         min="0"
                         step="0.01"

@@ -33,10 +33,29 @@ api.interceptors.response.use(
 
         // Handle specific error codes
         if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login';
-            toast.error('Session expired. Please login again.');
+            // Only logout on genuine authentication errors
+            const authErrors = [
+                'Token expired',
+                'Invalid token',
+                'Not authorized',
+                'User not found',
+                'jwt expired',
+                'jwt malformed'
+            ];
+
+            const isAuthError = authErrors.some(errMsg =>
+                message.toLowerCase().includes(errMsg.toLowerCase())
+            );
+
+            if (isAuthError) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                toast.error('Session expired. Please login again.');
+            } else {
+                // Don't logout for other 401 errors (might be API-specific)
+                toast.error(message);
+            }
         } else if (error.response?.status === 403) {
             toast.error('You do not have permission to perform this action.');
         } else {

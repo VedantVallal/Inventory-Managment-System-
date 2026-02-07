@@ -31,7 +31,7 @@ const ActivityList = ({ activities }) => {
     return (
         <div className="bg-white rounded-card shadow-card p-6">
             <h3 className="text-lg font-semibold text-text-primary mb-4">Recent Activities</h3>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {activities.length === 0 ? (
                     <p className="text-text-muted text-center py-8">No recent activities</p>
                 ) : (
