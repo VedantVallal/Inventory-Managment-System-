@@ -95,7 +95,7 @@ const Sales = () => {
                                 <tr className="border-b-2 border-gray-200 bg-bg-secondary">
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Invoice #</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Date</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Customer</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Products</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Total Qty</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Total</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Payment</th>
@@ -106,25 +106,27 @@ const Sales = () => {
                                 {!Array.isArray(sales) || sales.length === 0 ? (
                                     <tr>
                                         <td colSpan="7" className="px-6 py-12 text-center text-text-muted">
-                                            No sales found. Click "New Sale" to create one.
+                                            No sales found.
                                         </td>
                                     </tr>
                                 ) : (
                                     sales.map((sale, index) => {
-                                        const badge = getPaymentBadge(sale.payment_method);
+                                        const badge = getPaymentBadge(sale.payment_method?.toLowerCase());
+                                        const productNames = sale.bill_items?.map(item => item.product_name).join(', ') || 'N/A';
+
                                         return (
                                             <tr
                                                 key={sale.id}
                                                 className="border-b border-gray-200 hover:bg-bg-primary transition-colors"
                                             >
                                                 <td className="px-6 py-4 font-medium text-text-primary">
-                                                    {index + 1}
+                                                    {sale.bill_number || index + 1}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-text-secondary">
                                                     {new Date(sale.bill_date).toLocaleDateString('en-IN')}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-text-secondary">
-                                                    {sale.customers?.customer_name || 'Walk-in'}
+                                                <td className="px-6 py-4 text-sm text-text-secondary max-w-[200px] truncate" title={productNames}>
+                                                    {productNames}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-text-secondary">
                                                     {sale.total_items || 0} units

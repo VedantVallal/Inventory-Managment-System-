@@ -23,8 +23,8 @@ const Features = () => {
         },
         {
             icon: Scan,
-            title: 'secure',
-            description: 'Scan products quickly',
+            title: 'Reliability',
+            description: 'review product in a glance',
             gradient: 'from-green-500 to-teal-500'
         },
         {

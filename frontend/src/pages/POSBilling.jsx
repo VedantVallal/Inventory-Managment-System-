@@ -23,7 +23,7 @@ import html2canvas from 'html2canvas';
 
 const POSBilling = () => {
     const navigate = useNavigate();
-    const receiptRef = React.useRef();
+    const receiptRef = React.useRef(null);
 
     // Products state
     const [products, setProducts] = useState([]);
@@ -197,7 +197,7 @@ const POSBilling = () => {
 
                 // Prepare receipt data
                 const receipt = {
-                    billNumber: saleData.id || saleData.sale_id || 'N/A',
+                    billNumber: saleData.bill_number || saleData.id || 'N/A',
                     date: new Date().toISOString(),
                     items: billItems,
                     subtotal: subtotal,
@@ -231,13 +231,18 @@ const POSBilling = () => {
     };
 
     // Print receipt
-    const handlePrint = useReactToPrint({
-        content: () => receiptRef.current,
-        documentTitle: `Bill-${currentBill?.billNumber}`,
-        onAfterPrint: () => {
-            toast.success('Receipt printed successfully');
-        }
+    const handlePrintFn = useReactToPrint({
+        contentRef: receiptRef,
+        documentTitle: `Bill-${currentBill?.billNumber || 'Receipt'}`,
     });
+
+    const handlePrint = () => {
+        if (!receiptRef.current) {
+            toast.error('Receipt content not found');
+            return;
+        }
+        handlePrintFn();
+    };
 
     // Download receipt as PDF
     const handleDownloadPDF = async () => {

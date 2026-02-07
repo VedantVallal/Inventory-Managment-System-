@@ -1,24 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, LogOut, Search as SearchIcon, X, Package, Users, FileText, ShoppingBag } from 'lucide-react';
+import { Bell, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import alertService from '../../services/alert.service';
-import productService from '../../services/product.service';
-import supplierService from '../../services/supplier.service';
-import saleService from '../../services/sale.service';
-import purchaseService from '../../services/purchase.service';
 
 
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    // Search State
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState(null);
-    const [isSearching, setIsSearching] = useState(false);
-    const [showSearchDropdown, setShowSearchDropdown] = useState(false);
-    const searchRef = useRef(null);
+
 
     // Notification State
     const [alerts, setAlerts] = useState([]);
@@ -29,9 +20,7 @@ const Navbar = () => {
     // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setShowSearchDropdown(false);
-            }
+
             if (notificationRef.current && !notificationRef.current.contains(event.target)) {
                 setShowNotifications(false);
             }
@@ -95,43 +84,7 @@ const Navbar = () => {
         }
     };
 
-    // Search Logic
-    useEffect(() => {
-        const delaySearch = setTimeout(() => {
-            if (searchQuery.trim().length > 1) {
-                performSearch();
-            } else {
-                setSearchResults(null);
-                setShowSearchDropdown(false);
-            }
-        }, 500); // Debounce 500ms
 
-        return () => clearTimeout(delaySearch);
-    }, [searchQuery]);
-
-    const performSearch = async () => {
-        setIsSearching(true);
-        setShowSearchDropdown(true);
-        try {
-            const [productsRes, suppliersRes, salesRes, purchasesRes] = await Promise.all([
-                productService.getAll({ search: searchQuery, limit: 3 }),
-                supplierService.getAll({ search: searchQuery }),
-                saleService.getAll({ search: searchQuery, limit: 3 }),
-                purchaseService.getAll({ search: searchQuery, limit: 3 }),
-            ]);
-
-            setSearchResults({
-                products: productsRes.success ? productsRes.data.products.slice(0, 3) : [],
-                suppliers: suppliersRes.success ? suppliersRes.data.suppliers.slice(0, 3) : [],
-                bills: salesRes.success ? salesRes.data.bills.slice(0, 3) : [],
-                purchases: purchasesRes.success ? purchasesRes.data.purchases.slice(0, 3) : [],
-            });
-        } catch (error) {
-            console.error('Search error:', error);
-        } finally {
-            setIsSearching(false);
-        }
-    };
 
     const handleLogout = () => {
         logout();
@@ -141,138 +94,7 @@ const Navbar = () => {
     return (
         <div className="bg-white border-b border-gray-200 px-6 py-4 z-20 relative">
             <div className="flex items-center justify-between">
-                {/* Search Bar */}
-                <div className="flex-1 max-w-xl relative" ref={searchRef}>
-                    <div className="relative">
-                        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted" size={18} />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onFocus={() => searchQuery.length > 1 && setShowSearchDropdown(true)}
-                            placeholder="Search products, suppliers, bills, purchases..."
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan focus:border-transparent transition-shadow"
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => { setSearchQuery(''); setSearchResults(null); }}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                            >
-                                <X size={16} />
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Search Results Dropdown */}
-                    {showSearchDropdown && searchResults && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden max-h-96 overflow-y-auto">
-                            {isSearching ? (
-                                <div className="p-4 text-center text-text-muted">Searching...</div>
-                            ) : (
-                                <>
-                                    {/* Products */}
-                                    {searchResults.products?.length > 0 && (
-                                        <div className="p-2">
-                                            <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 px-2">Products</div>
-                                            {searchResults.products.map(p => (
-                                                <div
-                                                    key={p.id}
-                                                    onClick={() => navigate('/products')}
-                                                    className="flex items-center gap-3 p-2 hover:bg-bg-secondary rounded cursor-pointer group"
-                                                >
-                                                    <div className="w-8 h-8 rounded bg-cyan/10 flex items-center justify-center text-cyan">
-                                                        <Package size={16} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-text-primary group-hover:text-cyan transition-colors">{p.product_name}</p>
-                                                        <p className="text-xs text-text-muted">SKU: {p.sku} • Stock: {p.current_stock}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {/* Suppliers */}
-                                    {searchResults.suppliers?.length > 0 && (
-                                        <div className="p-2 border-t border-gray-100">
-                                            <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 px-2">Suppliers</div>
-                                            {searchResults.suppliers.map(s => (
-                                                <div
-                                                    key={s.id}
-                                                    onClick={() => navigate('/suppliers')}
-                                                    className="flex items-center gap-3 p-2 hover:bg-bg-secondary rounded cursor-pointer group"
-                                                >
-                                                    <div className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-600">
-                                                        <Users size={16} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-text-primary group-hover:text-blue-600 transition-colors">{s.supplier_name}</p>
-                                                        <p className="text-xs text-text-muted">{s.phone}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {/* Bills */}
-                                    {searchResults.bills?.length > 0 && (
-                                        <div className="p-2 border-t border-gray-100">
-                                            <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 px-2">Bills</div>
-                                            {searchResults.bills.map(b => (
-                                                <div
-                                                    key={b.id}
-                                                    onClick={() => navigate(`/sales`)}
-                                                    className="flex items-center gap-3 p-2 hover:bg-bg-secondary rounded cursor-pointer group"
-                                                >
-                                                    <div className="w-8 h-8 rounded bg-green-100 flex items-center justify-center text-green-600">
-                                                        <FileText size={16} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-text-primary group-hover:text-green-600 transition-colors">Bill #{b.bill_number}</p>
-                                                        <p className="text-xs text-text-muted">Total: ₹{parseFloat(b.total_amount).toFixed(2)}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {/* Purchases */}
-                                    {searchResults.purchases?.length > 0 && (
-                                        <div className="p-2 border-t border-gray-100">
-                                            <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2 px-2">Purchases</div>
-                                            {searchResults.purchases.map(p => (
-                                                <div
-                                                    key={p.id}
-                                                    onClick={() => navigate(`/purchases`)}
-                                                    className="flex items-center gap-3 p-2 hover:bg-bg-secondary rounded cursor-pointer group"
-                                                >
-                                                    <div className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-600">
-                                                        <ShoppingBag size={16} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-text-primary group-hover:text-purple-600 transition-colors">Purchase #{p.invoice_number}</p>
-                                                        <p className="text-xs text-text-muted">Total: ₹{parseFloat(p.total_amount).toFixed(2)}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {/* No Results */}
-                                    {searchResults.products?.length === 0 &&
-                                        searchResults.suppliers?.length === 0 &&
-                                        searchResults.bills?.length === 0 &&
-                                        searchResults.purchases?.length === 0 && (
-                                            <div className="p-8 text-center text-text-muted">
-                                                <SearchIcon className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                                                <p>No results found for "{searchQuery}"</p>
-                                            </div>
-                                        )}
-                                </>
-                            )}
-                        </div>
-                    )}
-                </div>
+                <div className="flex-1"></div>
 
                 {/* Right Side */}
                 <div className="flex items-center gap-4">

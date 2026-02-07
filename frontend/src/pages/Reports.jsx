@@ -43,13 +43,25 @@ const Reports = () => {
             setPurchases(purchasesData);
 
             // Calculate metrics
-            const totalSales = salesData.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0);
+            let totalRevenue = 0;
+            let totalCost = 0;
+
+            salesData.forEach(sale => {
+                totalRevenue += parseFloat(sale.total_amount || 0);
+                sale.bill_items?.forEach(item => {
+                    // Use the purchase price at time of sale if available, otherwise fallback to current product price
+                    const purchasePrice = parseFloat(item.products?.purchase_price || 0);
+                    totalCost += (purchasePrice * parseInt(item.quantity));
+                });
+            });
+
             const totalPurchases = purchasesData.reduce((sum, purchase) => sum + parseFloat(purchase.total_amount || 0), 0);
             const lowStockCount = productsData.filter(p => p.current_stock <= p.min_stock_level).length;
 
             setMetrics({
-                totalSales,
-                totalPurchases,
+                totalSales: parseFloat(totalRevenue.toFixed(2)),
+                totalPurchases: parseFloat(totalPurchases.toFixed(2)), // Keep for display
+                totalCost: parseFloat(totalCost.toFixed(2)),         // For margin calculation
                 totalProducts: productsData.length,
                 lowStockCount,
             });
@@ -238,17 +250,11 @@ const Reports = () => {
                                 <span className="text-sm text-text-secondary">Total Purchase Orders</span>
                                 <span className="font-semibold text-text-primary">{purchases.length}</span>
                             </div>
-                            <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                            <div className="flex justify-between items-center">
                                 <span className="text-sm text-text-secondary">Average Sale Value</span>
                                 <span className="font-semibold text-text-primary">
                                     ₹{sales.length > 0 ? (metrics.totalSales / sales.length).toFixed(2) : 0}
                                 </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-text-secondary">Profit Margin</span>
-                                <Badge variant="success">
-                                    {metrics.totalSales > 0 ? ((metrics.totalSales - metrics.totalPurchases) / metrics.totalSales * 100).toFixed(1) : 0}%
-                                </Badge>
                             </div>
                         </div>
                     </Card>

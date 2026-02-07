@@ -27,7 +27,14 @@ const getAllBills = async (req, res) => {
         ),
         bill_items (
             id,
-            quantity
+            product_id,
+            product_name,
+            quantity,
+            unit_price,
+            total,
+            products (
+                purchase_price
+            )
         )
       `, { count: 'exact' })
             .eq('business_id', businessId)
